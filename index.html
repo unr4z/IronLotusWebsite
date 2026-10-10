@@ -151,6 +151,16 @@ main, .topbar, .site-footer { position: relative; z-index: 1; }
 .portal-danger:hover { border-color: rgba(255,80,60,.5); box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 24px rgba(255,70,40,.2); background: rgba(255,70,40,.06); }
 .portal-danger .portal-icon { color: #ff6a4d; }
 
+/* Chinese-style gold key corner ornaments on framed cards */
+:root { --cn-corner: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2044%2044%22%3E%3Cg%20fill%3D%22none%22%20stroke-linecap%3D%22square%22%20stroke-linejoin%3D%22miter%22%3E%3Cpath%20d%3D%22M3%2032%20L3%203%20L32%203%22%20stroke%3D%22%233a0d06%22%20stroke-width%3D%226%22%2F%3E%3Cpath%20d%3D%22M12%2032%20L12%2012%20L32%2012%22%20stroke%3D%22%233a0d06%22%20stroke-width%3D%226%22%2F%3E%3Cpath%20d%3D%22M12%2022%20L22%2022%20L22%2012%22%20stroke%3D%22%233a0d06%22%20stroke-width%3D%226%22%2F%3E%3Cpath%20d%3D%22M3%2032%20L3%203%20L32%203%22%20stroke%3D%22%23e6ab3e%22%20stroke-width%3D%222.6%22%2F%3E%3Cpath%20d%3D%22M12%2032%20L12%2012%20L32%2012%22%20stroke%3D%22%23e6ab3e%22%20stroke-width%3D%222.6%22%2F%3E%3Cpath%20d%3D%22M12%2022%20L22%2022%20L22%2012%22%20stroke%3D%22%23e6ab3e%22%20stroke-width%3D%222.6%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"); }
+.cn-frame { position: relative; }
+.cn-corner { position: absolute; width: 24px; height: 24px; background: var(--cn-corner) center/contain no-repeat; pointer-events: none; z-index: 3; opacity: .92; }
+.cn-corner.c-tl { top: 5px; left: 5px; }
+.cn-corner.c-tr { top: 5px; right: 5px; transform: rotate(90deg); }
+.cn-corner.c-br { bottom: 5px; right: 5px; transform: rotate(180deg); }
+.cn-corner.c-bl { bottom: 5px; left: 5px; transform: rotate(270deg); }
+.owner-card .cn-corner { width: 30px; height: 30px; }
+
 /* ---- prose / lore ---- */
 .prose { max-width: 680px; margin: 30px 0 0; }
 .prose p { color: var(--soft); font-weight: 300; font-size: 1.07rem; margin: 0 0 18px; }
@@ -469,19 +479,19 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
         </div>
       </div>
       <div class="portal-grid">
-        <button class="portal" data-page="lore">
+        <button class="portal cn-frame" data-page="lore">
           <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h7v16H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2z"/></svg></span>
           <h3>Lore</h3><p>The story written in fire.</p>
         </button>
-        <button class="portal" data-page="design">
+        <button class="portal cn-frame" data-page="design">
           <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-.5-.5-2.1 2.6-2.6Z"/></svg></span>
           <h3>Design</h3><p>Art, animation & sound.</p>
         </button>
-        <button class="portal" data-page="holders">
+        <button class="portal cn-frame" data-page="holders">
           <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
           <h3>Holders</h3><p>Who carries the bloom.</p>
         </button>
-        <button class="portal" data-page="abilities">
+        <button class="portal cn-frame" data-page="abilities">
           <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></span>
           <h3>Abilities</h3><p>Four custom moves.</p>
         </button>
@@ -630,12 +640,12 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
       </div>
       <h2 class="band">— How it's earned —</h2>
       <div class="earn-grid">
-        <article class="earn">
+        <article class="earn cn-frame">
           <span class="earn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 15 4-10 4 6 4-6 4 10Z"/><path d="M4 15h16v4H4z"/></svg></span>
           <h3>Own a copy</h3>
           <p>Hold a copy of <strong>Iron Lotus</strong> and the title is bound to you.</p>
         </article>
-        <article class="earn">
+        <article class="earn cn-frame">
           <span class="earn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-.5-.5-2.1 2.6-2.6Z"/></svg></span>
           <h3>Contribute</h3>
           <p>Help create the custom through design, VFX, sound, or more — or support it financially — to earn it by craft.</p>
@@ -791,7 +801,7 @@ function render() {
     const role = p.role ? `<p class="person-role">${esc(p.role)}</p>` : "";
     const link = p.profile && p.profile !== "#" ? `<a class="person-link" href="${esc(p.profile)}" target="_blank" rel="noopener">Roblox Profile ↗</a>` : "";
     const quote = p.quote ? `<figure class="owner-quote">“${esc(p.quote)}”${p.by ? `<span>${esc(p.by)}</span>` : ""}</figure>` : "";
-    return `<article class="person owner-card">
+    return `<article class="person owner-card cn-frame">
       <canvas class="owner-fire" aria-hidden="true"></canvas>
       <div class="owner-main"><div class="person-avatar">${av}</div>
         <div class="owner-info"><h4 class="person-name">${esc(p.name)} <span class="owner-pill">Owner</span></h4>${handle}${role}${link}</div></div>
@@ -816,7 +826,7 @@ function render() {
 
   const ab = $("#abilities");
   if (ab) ab.innerHTML = data.abilities.map((a) =>
-    `<article class="ability"><span class="ability-slot">${esc(a.slot)}</span><h3>${esc(a.name)}</h3><p>${esc(a.desc)}</p></article>`).join("");
+    `<article class="ability cn-frame"><span class="ability-slot">${esc(a.slot)}</span><h3>${esc(a.name)}</h3><p>${esc(a.desc)}</p></article>`).join("");
 }
 
 function animateBars() {
@@ -1420,9 +1430,18 @@ function initTextFire() {
   (function loop() { setTimeout(() => { flareOne(); loop(); }, 6500 + Math.random()*8000); })();
 }
 
+/* ---------- Chinese key-corner ornaments on framed cards ---------- */
+function initCnFrames() {
+  const corners = ["c-tl", "c-tr", "c-br", "c-bl"];
+  $$(".cn-frame").forEach((el) => {
+    if (el.querySelector(".cn-corner")) return;
+    corners.forEach((c) => { const s = document.createElement("span"); s.className = "cn-corner " + c; s.setAttribute("aria-hidden", "true"); el.appendChild(s); });
+  });
+}
+
 /* ---------- boot ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  render(); initReveal(); initPages(); initBar(); initParallax(); initSearch();
+  render(); initCnFrames(); initReveal(); initPages(); initBar(); initParallax(); initSearch();
   initLightbox(); initSfx(); initFire(); initAmbience(); initOwnerFire(); initTextFire();
 });
 </script>
