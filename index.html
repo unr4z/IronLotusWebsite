@@ -1368,26 +1368,30 @@ function initBlackout() {
 function initTextFire() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const SEL = ".page.is-active .hero-title, .page.is-active .page-title, .page.is-active .title-name, .page.is-active .band, .page.is-active .h-lux";
-  // embers rising around the whole heading while it flickers
+  // embers tracing a circular / oval ring around the heading (around it, not filling it)
   function emberBurst(r) {
-    const pad = Math.max(26, r.height*0.7);
+    const pad = Math.max(24, r.height*0.65);
     const W = Math.max(8, r.width + pad*2), H = Math.max(8, r.height + pad*2);
     const cv = document.createElement("canvas"); cv.width = Math.round(W); cv.height = Math.round(H);
     cv.style.cssText = `position:fixed;left:${r.left-pad}px;top:${r.top-pad}px;width:${W}px;height:${H}px;z-index:45;pointer-events:none;`;
     document.body.appendChild(cv);
-    const x = cv.getContext("2d"), cw = cv.width, chh = cv.height;
+    const x = cv.getContext("2d"), cw = cv.width, chh = cv.height, cx = cw/2, cy = chh/2;
+    const rx = r.width/2 + pad*0.55, ry = r.height/2 + pad*0.7;   // ring radii around the text
     const cols = ["255,210,110", "255,150,60", "255,110,40", "255,186,96"];
-    const sp = glowSprites(cols, 18);
+    const sp = glowSprites(cols, 16);
     let parts = [], start = performance.now(); const EMIT = 1800;
-    const mk = () => ({ x: Math.random()*cw, y: pad*0.2 + Math.random()*(r.height + pad*1.2),
-      vy: -(Math.random()*0.7 + 0.3), vx: (Math.random()-0.5)*0.4, r: Math.random()*1.8 + 0.9,
-      ci: (Math.random()*cols.length)|0, a: Math.random()*0.5 + 0.4, t: Math.random()*6, tw: Math.random()*0.18 + 0.1,
-      life: 1, fade: Math.random()*0.01 + 0.008 });
+    const mk = () => {
+      const ang = Math.random()*Math.PI*2, jr = 1 + (Math.random()-0.5)*0.16;   // spawn on the ellipse perimeter
+      return { x: cx + Math.cos(ang)*rx*jr, y: cy + Math.sin(ang)*ry*jr,
+        vx: Math.cos(ang)*0.12 + (Math.random()-0.5)*0.18, vy: Math.sin(ang)*0.10 - (Math.random()*0.28 + 0.08),
+        r: Math.random()*1.5 + 0.8, ci: (Math.random()*cols.length)|0, a: Math.random()*0.5 + 0.45,
+        t: Math.random()*6, tw: Math.random()*0.18 + 0.1, life: 1, fade: Math.random()*0.012 + 0.01 };
+    };
     function fr(now) {
       const el = now - start; x.clearRect(0, 0, cw, chh); x.globalCompositeOperation = "lighter";
-      if (el < EMIT) for (let i = 0; i < 2; i++) parts.push(mk());
+      if (el < EMIT) for (let i = 0; i < 3; i++) parts.push(mk());
       for (let i = parts.length-1; i >= 0; i--) {
-        const q = parts[i]; q.t += q.tw; q.y += q.vy; q.x += q.vx + Math.sin(q.t)*0.3; q.life -= q.fade;
+        const q = parts[i]; q.t += q.tw; q.x += q.vx + Math.sin(q.t)*0.2; q.y += q.vy; q.life -= q.fade;
         if (q.life <= 0) { parts.splice(i, 1); continue; }
         const tw = 0.4 + 0.6*Math.abs(Math.sin(q.t*2)), a = q.a * tw * Math.max(0, Math.min(1, q.life*1.4)), s = q.r*7;
         x.globalAlpha = a; x.drawImage(sp[q.ci], q.x - s/2, q.y - s/2, s, s);
@@ -1400,7 +1404,10 @@ function initTextFire() {
   function flareOne() {
     const els = $$(SEL).filter((el) => el.offsetParent !== null);
     if (!els.length) return;
-    const el = els[(Math.random()*els.length)|0];
+    // favour the big titles (hero "Iron Lotus", page titles, "Cinderbound") so they flare often too
+    const pool = [];
+    els.forEach((el) => { const big = /\b(hero-title|page-title|title-name)\b/.test(el.className); for (let i = 0; i < (big ? 3 : 1); i++) pool.push(el); });
+    const el = pool[(Math.random()*pool.length)|0];
     el.classList.add("fire-flare");
     setTimeout(() => el.classList.remove("fire-flare"), 2300);
     emberBurst(el.getBoundingClientRect());
