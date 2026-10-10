@@ -213,6 +213,9 @@ main, .topbar, .site-footer { position: relative; z-index: 1; }
 .player-vol svg { width: 18px; height: 18px; }
 input[type=range] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; background: rgba(255,150,70,.25); cursor: pointer; }
 .player-vol input { width: 84px; }
+.player-seek { margin-top: 8px; }
+.player-seek input { width: 100%; display: block; }
+.player-time { display: block; margin-top: 5px; font-size: .68rem; color: var(--mute); font-variant-numeric: tabular-nums; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--flame); box-shadow: 0 0 8px rgba(var(--f-rgb),.7); }
 input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: var(--flame); }
 .tracklist { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 6px; }
@@ -549,8 +552,9 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
                 <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
               </button>
               <div class="player-now">
-                <span class="player-title" id="playerTitle">Ember Theme</span>
-                <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <span class="player-title" id="playerTitle">Iron Lotus - Mili</span>
+                <div class="player-seek"><input type="range" id="playerSeek" min="0" max="1000" value="0" step="1" aria-label="Seek" /></div>
+                <span class="player-time"><span id="playerCur">0:00</span> / <span id="playerDur">0:00</span></span>
               </div>
               <div class="player-vol">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
@@ -742,9 +746,7 @@ const data = {
     { slot: "Move 4", name: "Final Verdict", desc: "A committed overhead cleave that unbinds the enemy's guard and detonates the stored flame." },
   ],
   tracks: [
-    { title: "Ember Theme", demo: true },
-    { title: "Reception Hall", soon: true },
-    { title: "The Last Page", soon: true },
+    { title: "Iron Lotus - Mili", active: true },
   ],
 };
 
@@ -822,8 +824,8 @@ function render() {
   if (sheet) sheet.innerHTML = data.stats.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("");
 
   const tl = $("#tracklist");
-  if (tl) tl.innerHTML = data.tracks.map((t, i) =>
-    `<li class="${t.demo ? "active" : ""}">${esc(t.title)}${t.soon ? '<span class="tk-soon">soon</span>' : (t.demo ? '<span class="tk-soon">demo</span>' : "")}</li>`).join("");
+  if (tl) tl.innerHTML = data.tracks.map((t) =>
+    `<li class="${t.active ? "active" : ""}">${esc(t.title)}</li>`).join("");
 
   const ab = $("#abilities");
   if (ab) ab.innerHTML = data.abilities.map((a) =>
@@ -1277,6 +1279,10 @@ const PosePlayer = (() => {
     setVol(v) { vol = v; if (player && ready && !muted) { try { player.setVolume(v); } catch (e) {} } },
     setMuted(m) { muted = m; if (player && ready) { try { m ? player.mute() : (player.unMute(), player.setVolume(vol)); } catch (e) {} } },
     failed() { return failed; },
+    isPlaying() { return playing; },
+    cur() { try { return (player && ready) ? player.getCurrentTime() : 0; } catch (e) { return 0; } },
+    dur() { try { return (player && ready) ? player.getDuration() : 0; } catch (e) { return 0; } },
+    seek(sec) { if (player && ready) { try { player.seekTo(sec, true); } catch (e) {} } },
   };
 })();
 
@@ -1297,6 +1303,9 @@ function initAmbience() {
 
   // pose player
   const player = $("#player"), toggle = $("#playerToggle"), vol = $("#playerVol");
+  const seek = $("#playerSeek"), curEl = $("#playerCur"), durEl = $("#playerDur");
+  const fmt = (s) => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s/60) + ":" + String(s%60).padStart(2, "0"); };
+  let scrubbing = false;
   if (player && toggle) {
     toggle.addEventListener("click", () => {
       Ambience.start();
@@ -1309,6 +1318,18 @@ function initAmbience() {
       }
     });
     if (vol) vol.addEventListener("input", () => { PosePlayer.setVol(+vol.value); Ambience.poseSetVol(vol.value / 100); });
+    if (seek) {
+      const seekTo = () => { const d = PosePlayer.dur(); if (d) PosePlayer.seek(d * (+seek.value / 1000)); };
+      seek.addEventListener("input", () => { scrubbing = true; const d = PosePlayer.dur(); if (d && curEl) curEl.textContent = fmt(d * (+seek.value / 1000)); });
+      seek.addEventListener("change", () => { seekTo(); scrubbing = false; });
+      // keep the bar + time in sync while the track plays
+      setInterval(() => {
+        const d = PosePlayer.dur(), c = PosePlayer.cur();
+        if (durEl && d) durEl.textContent = fmt(d);
+        if (!scrubbing && d) { if (seek) seek.value = String(Math.round(c / d * 1000)); if (curEl) curEl.textContent = fmt(c); }
+        player.classList.toggle("is-playing", PosePlayer.isPlaying());
+      }, 300);
+    }
   }
 }
 
