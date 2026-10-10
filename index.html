@@ -1000,7 +1000,7 @@ function initFire() {
       wd: w * (0.18 + Math.random()*0.16), col: hues[i % hues.length],
       amp: w*0.03 + Math.random()*w*0.04, freq: 0.0028 + Math.random()*0.004,
       phase: Math.random()*Math.PI*2, sp: (Math.random()*0.5+0.4) * (Math.random()<0.5?1:-1) * 0.004,
-      drift: (Math.random()-0.5)*0.09, a: 0.1 + Math.random()*0.06,
+      drift: (Math.random()-0.5)*0.09, a: 0.04 + Math.random()*0.035,
       pulse: Math.random()*Math.PI*2, pulseSp: 0.006 + Math.random()*0.006,
     }));
     embers = Array.from({ length: LOW_FX ? 24 : 58 }, () => spawnE(true));
