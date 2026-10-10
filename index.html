@@ -1368,28 +1368,32 @@ function initBlackout() {
 function initTextFire() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const SEL = ".page.is-active .hero-title, .page.is-active .page-title, .page.is-active .title-name, .page.is-active .band, .page.is-active .h-lux";
-  // embers tracing a circular / oval ring around the heading (around it, not filling it)
-  function emberBurst(r) {
-    const pad = Math.max(24, r.height*0.65);
-    const W = Math.max(8, r.width + pad*2), H = Math.max(8, r.height + pad*2);
+  // embers filling a round/oval area BEHIND the heading; the canvas tracks the heading every
+  // frame so it follows scrolling (and the hero parallax) instead of staying pinned.
+  function emberBurst(el) {
+    const r0 = el.getBoundingClientRect();
+    const pad = Math.max(24, r0.height*0.7);
+    const W = Math.max(8, r0.width + pad*2), H = Math.max(8, r0.height + pad*2);
     const cv = document.createElement("canvas"); cv.width = Math.round(W); cv.height = Math.round(H);
-    cv.style.cssText = `position:fixed;left:${r.left-pad}px;top:${r.top-pad}px;width:${W}px;height:${H}px;z-index:45;pointer-events:none;`;
+    cv.style.cssText = `position:fixed;left:${r0.left-pad}px;top:${r0.top-pad}px;width:${W}px;height:${H}px;z-index:0;pointer-events:none;`;
     document.body.appendChild(cv);
     const x = cv.getContext("2d"), cw = cv.width, chh = cv.height, cx = cw/2, cy = chh/2;
-    const rx = r.width/2 + pad*0.55, ry = r.height/2 + pad*0.7;   // ring radii around the text
+    const rx = r0.width/2 + pad*0.4, ry = r0.height/2 + pad*0.85;   // filled ellipse radii
     const cols = ["255,210,110", "255,150,60", "255,110,40", "255,186,96"];
     const sp = glowSprites(cols, 16);
     let parts = [], start = performance.now(); const EMIT = 1800;
     const mk = () => {
-      const ang = Math.random()*Math.PI*2, jr = 1 + (Math.random()-0.5)*0.16;   // spawn on the ellipse perimeter
-      return { x: cx + Math.cos(ang)*rx*jr, y: cy + Math.sin(ang)*ry*jr,
-        vx: Math.cos(ang)*0.12 + (Math.random()-0.5)*0.18, vy: Math.sin(ang)*0.10 - (Math.random()*0.28 + 0.08),
-        r: Math.random()*1.5 + 0.8, ci: (Math.random()*cols.length)|0, a: Math.random()*0.5 + 0.45,
-        t: Math.random()*6, tw: Math.random()*0.18 + 0.1, life: 1, fade: Math.random()*0.012 + 0.01 };
+      const ang = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random());   // uniform fill of the ellipse
+      return { x: cx + Math.cos(ang)*rx*rr, y: cy + Math.sin(ang)*ry*rr,
+        vx: (Math.random()-0.5)*0.25, vy: -(Math.random()*0.5 + 0.2),
+        r: Math.random()*1.5 + 0.8, ci: (Math.random()*cols.length)|0, a: Math.random()*0.5 + 0.4,
+        t: Math.random()*6, tw: Math.random()*0.18 + 0.1, life: 1, fade: Math.random()*0.012 + 0.009 };
     };
     function fr(now) {
-      const el = now - start; x.clearRect(0, 0, cw, chh); x.globalCompositeOperation = "lighter";
-      if (el < EMIT) for (let i = 0; i < 3; i++) parts.push(mk());
+      const r = el.getBoundingClientRect();          // follow the heading (scroll + parallax)
+      cv.style.left = (r.left - pad) + "px"; cv.style.top = (r.top - pad) + "px";
+      const el2 = now - start; x.clearRect(0, 0, cw, chh); x.globalCompositeOperation = "lighter";
+      if (el2 < EMIT) for (let i = 0; i < 4; i++) parts.push(mk());
       for (let i = parts.length-1; i >= 0; i--) {
         const q = parts[i]; q.t += q.tw; q.x += q.vx + Math.sin(q.t)*0.2; q.y += q.vy; q.life -= q.fade;
         if (q.life <= 0) { parts.splice(i, 1); continue; }
@@ -1397,7 +1401,7 @@ function initTextFire() {
         x.globalAlpha = a; x.drawImage(sp[q.ci], q.x - s/2, q.y - s/2, s, s);
       }
       x.globalAlpha = 1;
-      if (el < EMIT || parts.length) requestAnimationFrame(fr); else cv.remove();
+      if (el2 < EMIT || parts.length) requestAnimationFrame(fr); else cv.remove();
     }
     requestAnimationFrame(fr);
   }
@@ -1410,7 +1414,7 @@ function initTextFire() {
     const el = pool[(Math.random()*pool.length)|0];
     el.classList.add("fire-flare");
     setTimeout(() => el.classList.remove("fire-flare"), 2300);
-    emberBurst(el.getBoundingClientRect());
+    emberBurst(el);
   }
   (function loop() { setTimeout(() => { flareOne(); loop(); }, 6500 + Math.random()*8000); })();
 }
