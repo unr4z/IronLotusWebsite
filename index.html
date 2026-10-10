@@ -530,11 +530,6 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
         <figcaption class="frame-cap">The Iron Lotus — a naginata whose blade burns with living flame.</figcaption>
       </figure>
 
-      <h2 class="band">— Icon —</h2>
-      <figure class="showframe">
-        <div class="frame-art cn-whole" id="iconEmblem"></div>
-        <figcaption class="frame-cap">The in-game icon.<span class="pending">art pending</span></figcaption>
-      </figure>
 
       <h2 class="band">— Animations —</h2>
       <div class="media-2">
@@ -1251,13 +1246,47 @@ const HoverTune = (() => {
   };
 })();
 
+/* ---------- pose-theme player — plays the chosen track via YouTube's embed (synth fallback) ---------- */
+const PosePlayer = (() => {
+  const VIDEO = "LxduFWbbndE";
+  let player = null, ready = false, failed = false, loading = false, playing = false, vol = 70, muted = false;
+  try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
+  function load() {
+    if (loading) return; loading = true;
+    if (window.YT && window.YT.Player) { create(); return; }
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { if (prev) { try { prev(); } catch (e) {} } create(); };
+    const tag = document.createElement("script"); tag.src = "https://www.youtube.com/iframe_api"; tag.onerror = () => { failed = true; }; document.head.appendChild(tag);
+  }
+  function create() {
+    const host = document.createElement("div"); host.id = "ytPose"; host.style.cssText = "position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;"; document.body.appendChild(host);
+    try {
+      player = new YT.Player(host, { videoId: VIDEO,
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0 },
+        events: {
+          onReady: () => { ready = true; try { muted ? player.mute() : player.unMute(); player.setVolume(muted ? 0 : vol); } catch (e) {} if (playing) go(); },
+          onError: () => { failed = true; },
+          onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED) { try { player.seekTo(0, true); player.playVideo(); } catch (err) {} } },
+        } });
+    } catch (e) { failed = true; }
+  }
+  function go() { if (!player || !ready) return; try { muted ? player.mute() : player.unMute(); player.setVolume(muted ? 0 : vol); player.playVideo(); } catch (e) {} }
+  return {
+    warm() { if (!player && !failed) load(); },
+    toggle() { playing = !playing; if (playing) { if (!player) load(); else if (ready) go(); } else if (player && ready) { try { player.pauseVideo(); } catch (e) {} } return playing; },
+    setVol(v) { vol = v; if (player && ready && !muted) { try { player.setVolume(v); } catch (e) {} } },
+    setMuted(m) { muted = m; if (player && ready) { try { m ? player.mute() : (player.unMute(), player.setVolume(vol)); } catch (e) {} } },
+    failed() { return failed; },
+  };
+})();
+
 function initAmbience() {
   const btn = $("#soundToggle");
   const paint = () => { const m = Ambience.isMuted(); $(".ic-sound-on", btn).hidden = m; $(".ic-sound-off", btn).hidden = !m; btn.setAttribute("aria-pressed", String(!m)); };
   paint();
-  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
+  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
   addEventListener("pointerdown", kick); addEventListener("keydown", kick);
-  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); paint(); });
+  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); paint(); });
 
   // owner card hover plays the chosen theme via YouTube's embed; synth is the fallback
   const card = $(".owner-card");
@@ -1271,10 +1300,15 @@ function initAmbience() {
   if (player && toggle) {
     toggle.addEventListener("click", () => {
       Ambience.start();
-      if (Ambience.poseIsOn()) { Ambience.poseStop(); player.classList.remove("is-playing"); }
-      else { Ambience.poseStart(); player.classList.add("is-playing"); }
+      if (!PosePlayer.failed()) {
+        player.classList.toggle("is-playing", PosePlayer.toggle());   // YouTube track
+      } else {
+        // fallback to the synth theme (e.g. artifact preview where YouTube is blocked)
+        if (Ambience.poseIsOn()) { Ambience.poseStop(); player.classList.remove("is-playing"); }
+        else { Ambience.poseStart(); player.classList.add("is-playing"); }
+      }
     });
-    if (vol) vol.addEventListener("input", () => Ambience.poseSetVol(vol.value / 100));
+    if (vol) vol.addEventListener("input", () => { PosePlayer.setVol(+vol.value); Ambience.poseSetVol(vol.value / 100); });
   }
 }
 
