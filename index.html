@@ -294,6 +294,15 @@ main.web-shake { animation: webshake .5s ease-in-out infinite; }
 .earn p { color: var(--soft); font-weight: 300; margin: 0; font-size: .94rem; }
 .earn strong { color: var(--flame); font-weight: 600; }
 
+/* ---- abilities ---- */
+.ability-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 880px; margin: 34px 0 0; }
+.ability { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 22px; transition: transform .25s ease, border-color .25s ease, box-shadow .3s ease; }
+.ability:hover { transform: translateY(-4px); border-color: var(--line-strong); box-shadow: 0 14px 36px rgba(0,0,0,.45), 0 0 22px rgba(var(--f-rgb),.15); }
+.ability-slot { display: inline-block; font-family: var(--sans); font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-soft); border-radius: 100px; padding: 4px 11px; margin-bottom: 12px; }
+.ability h3 { font-family: var(--serif); font-weight: 600; font-size: 1.4rem; margin: 0 0 8px; color: #fff; }
+.ability p { color: var(--soft); font-weight: 300; margin: 0; font-size: .95rem; line-height: 1.7; }
+@media (max-width: 820px) { .ability-grid { grid-template-columns: 1fr; } }
+
 /* ---- changelog ---- */
 .progress-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin: 30px 0 0; max-width: 760px; }
 .status-pill { display: inline-flex; align-items: center; gap: 8px; font-size: .64rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-soft); border-radius: 100px; padding: 6px 13px; margin-bottom: 22px; }
@@ -424,7 +433,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
     <button class="navlink" data-page="design">Design</button>
     <button class="navlink" data-page="holders">Holders</button>
     <button class="navlink" data-page="title">Title</button>
-    <button class="navlink" data-page="changelog">Changelog</button>
+    <button class="navlink" data-page="abilities">Abilities</button>
   </nav>
   <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </header>
@@ -472,9 +481,9 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
           <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
           <h3>Holders</h3><p>Who carries the bloom.</p>
         </button>
-        <button class="portal" data-page="changelog">
-          <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-3 3 3 5-6"/></svg></span>
-          <h3>Changelog</h3><p>Every pass & rework.</p>
+        <button class="portal" data-page="abilities">
+          <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></span>
+          <h3>Abilities</h3><p>Four custom moves.</p>
         </button>
       </div>
     </div>
@@ -635,18 +644,14 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
     </div></div>
   </section>
 
-  <!-- CHANGELOG -->
-  <section class="page" id="page-changelog" hidden>
+  <!-- ABILITIES -->
+  <section class="page" id="page-abilities" hidden>
     <div class="subhero"><div class="wrap">
-      <p class="kicker">Updates</p>
-      <h1 class="page-title">Changelog</h1>
-      <p class="page-sub">Every pass, tweak, and rework — in order.</p>
+      <p class="kicker">Moveset</p>
+      <h1 class="page-title">Abilities</h1>
+      <p class="page-sub">Four custom abilities that replace the weapon's basic moves.</p>
       <span class="rule"></span>
-      <div class="progress-card">
-        <span class="status-pill"><i></i> In development</span>
-        <div class="bars" id="progress-bars"></div>
-      </div>
-      <ol class="timeline" id="timeline"></ol>
+      <div class="ability-grid" id="abilities"></div>
     </div></div>
   </section>
 </main>
@@ -718,13 +723,12 @@ const data = {
     ["Tier", "Exclusive Custom"], ["Type", "Naginata"], ["Rarity", "Custom"],
     ["Moveset", "Reading / Unbinding"], ["Wielder", "Divine"],
   ],
-  progress: [
-    { label: "Model", pct: 100 }, { label: "Animations", pct: 40 },
-    { label: "VFX", pct: 55 }, { label: "Balancing", pct: 20 },
-  ],
-  timeline: [
-    { ver: "v0.1", year: "2026", notes: ["Concept seeded — the burning-library idea.", "First model blocked out."] },
-    { ver: "v0.2", year: "2026", notes: ["Iron-petal model refined.", "Ember VFX exploration began."] },
+  // Four custom abilities that replace the basic moves (edit names/descriptions freely)
+  abilities: [
+    { slot: "Move 1", name: "Ember Arc", desc: "A sweeping naginata slash that leaves a lingering wall of flame along its path." },
+    { slot: "Move 2", name: "Page Burn", desc: "Hurls a spiral of burning pages that latch onto the target and sear over time." },
+    { slot: "Move 3", name: "Iron Bloom", desc: "The blade blossoms outward in a ring of petals, knocking back and igniting nearby foes." },
+    { slot: "Move 4", name: "Final Verdict", desc: "A committed overhead cleave that unbinds the enemy's guard and detonates the stored flame." },
   ],
   tracks: [
     { title: "Ember Theme", demo: true },
@@ -810,15 +814,9 @@ function render() {
   if (tl) tl.innerHTML = data.tracks.map((t, i) =>
     `<li class="${t.demo ? "active" : ""}">${esc(t.title)}${t.soon ? '<span class="tk-soon">soon</span>' : (t.demo ? '<span class="tk-soon">demo</span>' : "")}</li>`).join("");
 
-  const bars = $("#progress-bars");
-  if (bars) bars.innerHTML = data.progress.map((b) =>
-    `<div class="bar"><div class="bar-top"><span>${esc(b.label)}</span><span class="pct">${b.pct}%</span></div>
-     <div class="bar-track"><div class="bar-fill" data-pct="${b.pct}"></div></div></div>`).join("");
-
-  const tline = $("#timeline");
-  if (tline) tline.innerHTML = data.timeline.map((t) =>
-    `<li class="tl-item"><div class="tl-head"><span class="tl-ver">${esc(t.ver)}</span><span class="tl-year">${esc(t.year)}</span></div>
-     <p class="tl-note">${t.notes.map((n) => `<span>— ${esc(n)}</span>`).join("")}</p></li>`).join("");
+  const ab = $("#abilities");
+  if (ab) ab.innerHTML = data.abilities.map((a) =>
+    `<article class="ability"><span class="ability-slot">${esc(a.slot)}</span><h3>${esc(a.name)}</h3><p>${esc(a.desc)}</p></article>`).join("");
 }
 
 function animateBars() {
@@ -839,12 +837,11 @@ function initPages() {
     nav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false");
     if (history.replaceState) history.replaceState(null, "", `#${name}`);
     reReveal(name); heroReset();
-    if (name === "changelog") animateBars();
   }
   $$("[data-page]").forEach((el) => el.addEventListener("click", () => show(el.dataset.page)));
   toggle.addEventListener("click", () => { const o = nav.classList.toggle("open"); toggle.setAttribute("aria-expanded", String(o)); });
   const start = (location.hash || "").replace("#", "");
-  if (["home","lore","design","holders","title","changelog"].includes(start)) show(start);
+  if (["home","lore","design","holders","title","abilities"].includes(start)) show(start);
 }
 
 /* ---------- sticky bar ---------- */
@@ -1427,7 +1424,6 @@ function initTextFire() {
 document.addEventListener("DOMContentLoaded", () => {
   render(); initReveal(); initPages(); initBar(); initParallax(); initSearch();
   initLightbox(); initSfx(); initFire(); initAmbience(); initOwnerFire(); initTextFire();
-  if ($(".page.is-active") && $(".page.is-active").id === "page-changelog") animateBars();
 });
 </script>
 </body>
