@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Iron Lotus — Kizuki Custom</title>
+<meta name="description" content="Iron Lotus — a custom weapon in Kizuki, forged in the burning Library. Lore, design, holders, and title." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* =========================================================
+   IRON LOTUS — Kizuki custom · Library-of-Ruina inspired
+   Layout: fixed fire/atmosphere behind a sticky-nav SPA; warm orange/ember single-dark theme.
+   ========================================================= */
+:root {
+  color-scheme: dark;
+  /* ---- color tokens ---- */
+  --f-rgb: 255, 122, 26;              /* signature flame (flips to crimson during the burning) */
+  --flame: rgb(var(--f-rgb));
+  --ember: #ff4d12;
+  --ember-deep: #c23a0a;
+  --gold: #ffb84d;
+  --gold-soft: #d79a46;
+  --void: #0a0502;
+  --bg-1: #140a04;
+  --panel: rgba(70, 36, 14, 0.18);
+  --panel-solid: #1a0f06;
+  --line: rgba(255, 150, 70, 0.14);
+  --line-strong: rgba(255, 140, 50, 0.42);
+  --ink: #f6ece2;
+  --soft: #c3a892;
+  --mute: #8a6f5c;
+  /* ---- type tokens ---- */
+  --display: "Cinzel", "Cormorant Garamond", Georgia, serif;   /* carved, ceremonial headings */
+  --serif: "Cormorant Garamond", Georgia, serif;               /* body prose, quotes */
+  --sans: "Space Grotesk", system-ui, -apple-system, Segoe UI, Roboto, sans-serif; /* UI / data */
+  --radius: 14px; --radius-sm: 11px; --maxw: 1080px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: var(--sans); color: var(--ink); line-height: 1.6;
+  background:
+    radial-gradient(120% 70% at 50% -5%, #2a1403 0%, transparent 52%),
+    linear-gradient(180deg, var(--bg-1), var(--void));
+  min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+
+/* ---- fixed atmosphere layers ---- */
+#fire { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.emberglow {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: screen;
+  background:
+    radial-gradient(60% 55% at 18% 88%, rgba(var(--f-rgb),.10), transparent 70%),
+    radial-gradient(60% 50% at 84% 20%, rgba(255,70,10,.08), transparent 70%);
+  animation: flameflick 4.2s ease-in-out infinite;
+}
+@keyframes flameflick { 0%,100%{opacity:.7} 50%{opacity:1} }
+.haze {
+  position: fixed; left: -40%; right: -40%; top: -10%; bottom: -10%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(30% 52% at 20% 72%, rgba(255,150,60,.12), transparent 62%),
+    radial-gradient(34% 55% at 50% 84%, rgba(255,90,20,.14), transparent 62%),
+    radial-gradient(28% 50% at 80% 70%, rgba(255,160,70,.10), transparent 62%);
+  filter: blur(34px); mix-blend-mode: screen; animation: hazedrift 46s ease-in-out infinite alternate;
+}
+@keyframes hazedrift { from { transform: translate3d(-5%,1%,0) scale(1.05);} to { transform: translate3d(6%,-2%,0) scale(1.12);} }
+.vignette {
+  position: fixed; inset: 0; z-index: 3; pointer-events: none;
+  background:
+    radial-gradient(112% 86% at 50% 34%, transparent 40%, rgba(6,2,0,.72) 100%),
+    radial-gradient(100% 70% at 50% 120%, rgba(0,0,0,.7), transparent 55%);
+}
+.flicker {
+  position: fixed; inset: 0; z-index: 3; pointer-events: none; background: #050200; opacity: 0;
+  mix-blend-mode: multiply; animation: eerieflicker 34s linear infinite;
+}
+@keyframes eerieflicker { 0%,95.5%,100%{opacity:0} 96%{opacity:.4} 96.6%{opacity:.05} 97.3%{opacity:.28} 98%{opacity:0} }
+.scene-dim {
+  position: fixed; inset: 0; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 1.8s ease;
+  background: radial-gradient(circle 240px at var(--mx,50%) var(--my,45%), rgba(40,6,0,.06), rgba(20,2,0,.6) 42%, rgba(4,0,0,.97) 74%);
+}
+main, .topbar, .site-footer { position: relative; z-index: 1; }
+
+/* ---- topbar ---- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px clamp(16px,5vw,42px);
+  background: linear-gradient(180deg, rgba(10,5,2,.92), rgba(10,5,2,.3)); backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent; transition: border-color .35s ease, background .35s ease;
+}
+.topbar.is-scrolled { border-bottom-color: var(--line); background: rgba(10,5,2,.94); }
+.brand { display: flex; align-items: center; gap: 11px; background: none; border: 0; cursor: pointer; color: var(--ink); padding: 0; }
+.brand-emblem { width: 30px; height: 30px; filter: drop-shadow(0 0 9px rgba(var(--f-rgb),.65)); }
+.brand-name { font-family: var(--display); font-size: 1.22rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.brand:hover .brand-name { color: var(--flame); }
+.topnav { display: flex; gap: clamp(8px,2vw,26px); }
+.navlink { background: none; border: 0; cursor: pointer; font-family: var(--sans); font-size: .86rem; color: var(--soft); padding: 6px 2px; position: relative; transition: color .25s ease; }
+.navlink::after { content: ""; position: absolute; left: 0; bottom: -2px; height: 2px; width: 0; background: linear-gradient(90deg,var(--flame),var(--gold)); box-shadow: 0 0 10px var(--flame); transition: width .3s ease; }
+.navlink:hover { color: var(--ink); } .navlink.is-active { color: var(--ink); } .navlink.is-active::after { width: 100%; }
+.nav-toggle { display: none; background: none; border: 0; cursor: pointer; width: 34px; height: 30px; padding: 5px; }
+.nav-toggle span { display: block; height: 2px; background: var(--ink); margin: 5px 0; border-radius: 2px; }
+
+/* ---- hero ---- */
+.hero { min-height: clamp(520px, 86vh, 760px); display: grid; place-items: center; text-align: center; padding: 48px 20px; }
+.hero-inner { position: relative; animation: riseIn .9s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes riseIn { from { opacity: 0; transform: translateY(22px);} to { opacity: 1; transform: none;} }
+.hero-emblem { width: clamp(140px, 24vw, 220px); margin: 0 auto 26px; display: block; }
+.hero-emblem svg { width: 100%; height: auto; filter: drop-shadow(0 0 30px rgba(var(--f-rgb),.6)); animation: floaty 6s ease-in-out infinite, emberpulse 3.6s ease-in-out infinite; }
+@keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+@keyframes emberpulse { 0%,100%{filter:drop-shadow(0 0 22px rgba(var(--f-rgb),.4))} 50%{filter:drop-shadow(0 0 44px rgba(var(--f-rgb),.85))} }
+.kicker { font-family: var(--sans); font-size: .72rem; letter-spacing: .42em; text-transform: uppercase; color: var(--gold); margin: 0 0 14px; }
+.hero-title { font-family: var(--display); font-weight: 700; margin: 0; font-size: clamp(2.8rem, 8.5vw, 6rem); line-height: 1; letter-spacing: .04em; color: #fff; text-shadow: 0 2px 44px rgba(var(--f-rgb),.42); text-wrap: balance; }
+.hero-tag { font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem, 2.4vw, 1.5rem); color: var(--gold); margin: 18px 0 0; }
+.hero-title, .page-title, .title-name { animation: textflicker 24s linear infinite; }
+@keyframes textflicker { 0%,92%,100%{opacity:1;transform:translateX(0) skewX(0)} 93%{opacity:.35;transform:translateX(-3px) skewX(-1.2deg)} 94%{opacity:1;transform:translateX(2px) skewX(.8deg)} 95%{opacity:.6} 96%{opacity:1;transform:translateX(0)} }
+
+/* ---- wrap / page ---- */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-block: clamp(30px,5vw,56px); padding-inline: clamp(16px,5vw,42px); }
+.subhero .wrap { padding-top: clamp(48px,9vw,92px); }
+.page { display: none; }
+.page.is-active { display: block; animation: fadePage .5s ease both; }
+@keyframes fadePage { from { opacity: 0; } to { opacity: 1; } }
+.page-title { font-family: var(--display); font-weight: 700; font-size: clamp(2.3rem, 6.5vw, 4.2rem); line-height: 1.02; margin: 0; color: #fff; letter-spacing: .03em; text-wrap: balance; }
+.page-sub { color: var(--soft); font-weight: 300; max-width: 640px; margin: 16px 0 0; font-size: 1.02rem; }
+.rule { display: block; width: 92px; height: 1px; background: linear-gradient(90deg, var(--flame), transparent); margin: 26px 0 0; }
+.h-lux { font-family: var(--serif); font-weight: 600; font-size: clamp(1.5rem,3.5vw,2.1rem); margin: 0 0 14px; }
+.lav { color: var(--flame); } .gold { color: var(--gold); }
+
+/* ---- reveal ---- */
+.reveal { opacity: 0; transform: translateY(-24px); transition: opacity .6s ease var(--d,0s), transform .7s cubic-bezier(.2,.75,.2,1) var(--d,0s); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---- about + stat strip ---- */
+.about { display: grid; grid-template-columns: 220px 1fr; gap: 40px; align-items: center; margin-bottom: 44px; }
+.about-emblem svg { width: 100%; height: auto; filter: drop-shadow(0 0 26px rgba(var(--f-rgb),.45)); }
+.lead { color: var(--soft); font-weight: 300; font-size: 1.08rem; }
+.lead strong { color: var(--ink); font-weight: 600; }
+.stat-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; margin: 26px 0 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.stat-strip > div { background: var(--panel); padding: 16px 14px; }
+.stat-strip dt { font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); margin: 0 0 6px; }
+.stat-strip dd { margin: 0; font-family: var(--serif); font-size: 1.22rem; color: var(--ink); }
+
+/* ---- portals ---- */
+.portal-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.portal { text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; cursor: pointer; color: var(--ink); transition: transform .25s ease, border-color .25s ease, box-shadow .3s ease, background .3s ease; }
+.portal:hover { transform: translateY(-5px); border-color: var(--line-strong); box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 24px rgba(var(--f-rgb),.18); background: rgba(var(--f-rgb),.06); }
+.portal-icon { display: inline-grid; place-items: center; width: 34px; height: 34px; color: var(--flame); margin-bottom: 10px; }
+.portal-icon svg { width: 100%; height: 100%; }
+.portal h3 { font-family: var(--serif); font-weight: 600; font-size: 1.45rem; margin: 0 0 6px; }
+.portal p { color: var(--soft); font-weight: 300; font-size: .9rem; margin: 0; }
+.portal-danger:hover { border-color: rgba(255,80,60,.5); box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 24px rgba(255,70,40,.2); background: rgba(255,70,40,.06); }
+.portal-danger .portal-icon { color: #ff6a4d; }
+
+/* ---- prose / lore ---- */
+.prose { max-width: 680px; margin: 30px 0 0; }
+.prose p { color: var(--soft); font-weight: 300; font-size: 1.07rem; margin: 0 0 18px; }
+.prose p .em { color: var(--flame); font-weight: 500; }
+.lore-beat { text-align: center; font-family: var(--serif); font-style: italic; font-size: clamp(1.15rem,2.4vw,1.5rem); color: var(--ink); margin: 22px auto; }
+
+/* ---- bands ---- */
+.band { text-align: center; font-family: var(--sans); font-weight: 500; letter-spacing: .14em; font-size: clamp(.9rem,2vw,1.05rem); color: var(--flame); margin: 50px 0 24px; text-transform: uppercase;
+  background: linear-gradient(90deg, currentColor 0%, #fff 50%, currentColor 100%); background-size: 220% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 7s linear infinite; }
+@keyframes shimmer { to { background-position: -220% center; } }
+.band-alt { color: var(--gold); } .band-danger { color: #ff6a4d; }
+
+/* ---- design showcase ---- */
+.showframe { margin: 0 auto; max-width: 560px; }
+.showframe .zoom, .frame-art { display: block; width: 100%; border: 1px solid var(--line); border-radius: var(--radius); background:
+   radial-gradient(circle at 50% 42%, rgba(var(--f-rgb),.14), transparent 70%), var(--panel);
+  padding: 40px 24px; cursor: zoom-in; color: inherit; }
+.frame-art { cursor: default; display: grid; place-items: center; min-height: 190px; text-align: center; }
+.frame-art svg { width: clamp(90px,16vw,140px); filter: drop-shadow(0 0 24px rgba(var(--f-rgb),.55)); }
+.frame-cap { margin: 12px 0 0; font-family: var(--serif); font-style: italic; color: var(--soft); text-align: center; }
+.pending { display: inline-block; margin-top: 12px; font-family: var(--sans); font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--mute); border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; }
+.media-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* ---- pose music player ---- */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 10px; }
+.player { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.pm-label { font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--mute); margin: 0 0 14px; }
+.player-bar { display: flex; align-items: center; gap: 14px; }
+.player-toggle { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; border: 1px solid var(--line-strong); background: rgba(var(--f-rgb),.1); color: var(--flame); transition: transform .2s ease, background .2s ease; }
+.player-toggle:hover { transform: scale(1.06); background: rgba(var(--f-rgb),.18); }
+.player-toggle svg { width: 20px; height: 20px; }
+.player-toggle .ic-pause { display: none; }
+.player.is-playing .ic-play { display: none; } .player.is-playing .ic-pause { display: block; }
+.player-now { flex: 1; min-width: 0; }
+.player-title { display: block; font-family: var(--serif); font-size: 1.1rem; color: var(--ink); }
+.eq { display: flex; align-items: flex-end; gap: 3px; height: 16px; margin-top: 6px; opacity: .35; transition: opacity .3s ease; }
+.player.is-playing .eq { opacity: 1; }
+.eq i { width: 3px; background: linear-gradient(180deg,var(--flame),var(--gold)); border-radius: 2px; height: 30%; }
+.player.is-playing .eq i { animation: eq 1s ease-in-out infinite; }
+.eq i:nth-child(2){animation-delay:.15s} .eq i:nth-child(3){animation-delay:.3s} .eq i:nth-child(4){animation-delay:.45s} .eq i:nth-child(5){animation-delay:.6s} .eq i:nth-child(6){animation-delay:.75s}
+@keyframes eq { 0%,100%{height:25%} 50%{height:100%} }
+.player-vol { display: flex; align-items: center; gap: 8px; color: var(--soft); flex: none; }
+.player-vol svg { width: 18px; height: 18px; }
+input[type=range] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; background: rgba(255,150,70,.25); cursor: pointer; }
+.player-vol input { width: 84px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--flame); box-shadow: 0 0 8px rgba(var(--f-rgb),.7); }
+input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: var(--flame); }
+.tracklist { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 6px; }
+.tracklist li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: .9rem; color: var(--soft); }
+.tracklist li.active { border-color: var(--line-strong); color: var(--ink); background: rgba(var(--f-rgb),.07); }
+.tracklist .tk-soon { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+
+/* ---- statsheet ---- */
+.statsheet-wrap { max-width: 620px; margin: 0 auto; }
+.statsheet { width: 100%; border-collapse: collapse; }
+.statsheet td { padding: 13px 4px; border-bottom: 1px solid var(--line); }
+.statsheet td:first-child { color: var(--mute); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; width: 40%; }
+.statsheet td:last-child { font-family: var(--serif); font-size: 1.15rem; color: var(--ink); text-align: right; }
+
+/* ---- list tools / search ---- */
+.list-tools { margin: 28px 0 4px; }
+.search { width: 100%; max-width: 420px; font-family: var(--sans); font-size: .92rem; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 100px; padding: 11px 18px; }
+.search:focus { outline: none; border-color: var(--line-strong); }
+.search::placeholder { color: var(--mute); }
+.empty { color: var(--mute); font-style: italic; margin-top: 20px; }
+
+/* ---- people grid ---- */
+.people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.person { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 16px; text-align: center; transition: transform .25s ease, border-color .25s ease, box-shadow .3s ease; }
+.person:hover { transform: translateY(-5px); border-color: var(--line-strong); box-shadow: 0 14px 36px rgba(0,0,0,.45), 0 0 22px rgba(var(--f-rgb),.15); }
+.person-avatar { width: 92px; height: 92px; margin: 0 auto 12px; border-radius: 12px; overflow: hidden; border: 1px solid var(--gold-soft); background: #170c05; display: grid; place-items: center; }
+.person-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.person-avatar .ph { font-family: var(--display); font-size: 1.9rem; color: var(--flame); }
+.person-name { font-family: var(--serif); font-weight: 600; font-size: 1.2rem; margin: 0 0 4px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.person-handle { color: var(--gold); font-size: .78rem; margin: 0 0 6px; word-break: break-word; }
+.person-role { color: var(--soft); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 12px; }
+.person-link { display: inline-block; font-size: .7rem; color: var(--flame); text-decoration: none; border: 1px solid var(--line-strong); border-radius: 100px; padding: 6px 13px; letter-spacing: .03em; transition: background .2s ease, color .2s ease; }
+.person-link:hover { background: var(--flame); color: #1a0a02; }
+.owner-pill { font-family: var(--sans); font-size: .54rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-soft); border-radius: 100px; padding: 3px 9px; }
+
+/* ---- owner stretched card ---- */
+#owner { grid-template-columns: 1fr; }
+.owner-card { display: flex; align-items: center; gap: 34px; text-align: left; padding: 26px 32px; border-color: rgba(255,184,77,.4); overflow: hidden; position: relative; }
+.owner-card:hover { transform: none; border-color: rgba(255,184,77,.75); box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 30px rgba(255,150,60,.25); }
+.owner-main { display: flex; align-items: center; gap: 22px; flex: none; position: relative; z-index: 1; }
+.owner-card .person-avatar { margin: 0; border-color: rgba(255,184,77,.55); }
+.owner-info .person-name { justify-content: flex-start; margin-bottom: 6px; }
+.owner-info .person-role { color: var(--gold); margin-bottom: 12px; }
+.owner-quote { flex: 1; margin: 0; min-width: 0; position: relative; z-index: 1; font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem,2.2vw,1.45rem); color: var(--ink); text-align: center; }
+.owner-quote span { display: block; font-style: normal; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin-top: 10px; }
+.owner-fire { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; border-radius: var(--radius); }
+main.web-shake { animation: webshake .5s ease-in-out infinite; }
+@keyframes webshake { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-1.2px,1px)} 50%{transform:translate(1.2px,-1px)} 75%{transform:translate(-1px,-1px)} }
+
+/* ---- temp line + secret challenge ---- */
+.temp-line { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 24px; }
+.temp-line p { margin: 0; color: var(--soft); font-weight: 300; }
+.btn-learn { flex: none; background: none; border: 1px solid var(--line-strong); color: var(--flame); border-radius: 100px; padding: 9px 20px; cursor: pointer; font-family: var(--sans); font-size: .85rem; letter-spacing: .04em; transition: background .2s ease, color .2s ease; }
+.btn-learn:hover { background: var(--flame); color: #1a0a02; }
+.challenge-wrap { padding-top: clamp(40px,7vw,80px); }
+.btn-back { background: none; border: 1px solid var(--line); color: var(--soft); border-radius: 100px; padding: 8px 18px; cursor: pointer; font-family: var(--sans); font-size: .82rem; margin-bottom: 30px; transition: color .2s ease, border-color .2s ease; }
+.btn-back:hover { color: var(--flame); border-color: var(--line-strong); }
+.challenge-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 50px; align-items: start; }
+.challenge-left { text-align: center; }
+.ch-title { text-align: center; line-height: .95; }
+.ornament { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--mute); margin: 22px 0; font-size: .9rem; }
+.ornament::before, .ornament::after { content: ""; height: 1px; width: 90px; background: linear-gradient(90deg, transparent, var(--line), transparent); }
+.registry h4 { font-family: var(--sans); font-weight: 600; letter-spacing: .1em; color: var(--ink); margin: 0 0 14px; }
+.registry table { width: 100%; max-width: 360px; margin: 0 auto; border-collapse: collapse; }
+.registry td { padding: 8px 0; font-size: .95rem; }
+.registry td:first-child { text-align: left; color: var(--soft); }
+.registry td:last-child { text-align: right; font-weight: 600; }
+.reg-flame { color: var(--flame); } .reg-gold { color: var(--gold); } .reg-red { color: #ff6a4d; }
+.challenge-right p { color: var(--soft); font-weight: 300; margin: 0 0 14px; line-height: 1.7; }
+.big-link { display: inline-block; font-family: var(--serif); font-weight: 600; font-size: 1.4rem; color: #fff; text-decoration: underline; text-underline-offset: 4px; margin: 2px 0 26px; transition: color .2s ease; }
+.big-link:hover { color: var(--flame); }
+.challenge-heading { font-family: var(--display); font-weight: 700; font-size: clamp(2.2rem,6vw,3.8rem); letter-spacing: .03em; margin: 30px 0 8px; color: #fff; }
+.ch-soon { font-style: italic; color: var(--mute); }
+
+/* ---- blacklist ---- */
+.person.is-black { border-color: rgba(255,80,60,.28); }
+.person.is-black .person-avatar { border-color: rgba(255,80,60,.4); background: #1c0704; }
+.person.is-black .person-avatar .ph { color: #ff7a5e; }
+.person.is-black .person-handle { color: #ff9a82; }
+.person.is-black .person-role { color: #d98b7a; }
+.person.is-black:hover { border-color: rgba(255,80,60,.55); box-shadow: 0 14px 36px rgba(50,6,0,.5); }
+
+/* ---- title / crest ---- */
+.title-crest { text-align: center; max-width: 620px; margin: 0 auto; }
+.crest-badge { width: 84px; height: 84px; margin: 0 auto 18px; color: var(--flame); display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-strong); background: radial-gradient(circle at 50% 35%, rgba(var(--f-rgb),.16), transparent 70%); box-shadow: 0 0 40px rgba(var(--f-rgb),.25); }
+.crest-badge svg { width: 44px; height: 44px; }
+.title-name { font-family: var(--display); font-weight: 700; margin: 10px 0 0; font-size: clamp(2.3rem,6.5vw,4.2rem); line-height: 1; letter-spacing: .03em; background: linear-gradient(180deg,#fff,var(--flame)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 4px 24px rgba(var(--f-rgb),.35)); }
+.title-desc { color: var(--soft); font-weight: 300; font-size: 1.08rem; margin: 16px auto 0; max-width: 520px; }
+.earn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
+.earn { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 26px; text-align: center; transition: transform .25s ease, border-color .25s ease, box-shadow .3s ease; }
+.earn:hover { transform: translateY(-5px); border-color: var(--line-strong); box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 22px rgba(var(--f-rgb),.15); }
+.earn-icon { display: inline-grid; place-items: center; width: 50px; height: 50px; color: var(--flame); margin-bottom: 14px; }
+.earn-icon svg { width: 100%; height: 100%; }
+.earn h3 { font-family: var(--serif); font-weight: 600; font-size: 1.45rem; margin: 0 0 8px; }
+.earn p { color: var(--soft); font-weight: 300; margin: 0; font-size: .94rem; }
+.earn strong { color: var(--flame); font-weight: 600; }
+
+/* ---- changelog ---- */
+.progress-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin: 30px 0 0; max-width: 760px; }
+.status-pill { display: inline-flex; align-items: center; gap: 8px; font-size: .64rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-soft); border-radius: 100px; padding: 6px 13px; margin-bottom: 22px; }
+.status-pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+.bar { margin-bottom: 18px; } .bar:last-child { margin-bottom: 0; }
+.bar-top { display: flex; justify-content: space-between; font-size: .88rem; margin-bottom: 8px; }
+.bar-top .pct { color: var(--soft); font-variant-numeric: tabular-nums; }
+.bar-track { height: 7px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--ember), var(--gold)); width: 0; transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
+.timeline { list-style: none; padding: 0; margin: 46px 0 0; max-width: 760px; position: relative; }
+.timeline::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(180deg, transparent, var(--line) 10%, var(--line) 90%, transparent); }
+.tl-item { position: relative; padding: 0 0 30px 34px; }
+.tl-item::before { content: ""; position: absolute; left: 0; top: 5px; width: 13px; height: 13px; border-radius: 50%; background: var(--void); border: 2px solid var(--flame); box-shadow: 0 0 10px rgba(var(--f-rgb),.6); }
+.tl-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.tl-ver { font-family: var(--display); font-size: 1.15rem; font-weight: 600; letter-spacing: .04em; }
+.tl-year { font-size: .72rem; letter-spacing: .14em; color: var(--gold); }
+.tl-note { color: var(--soft); font-weight: 300; margin: 0; font-size: .95rem; }
+.tl-note span { display: block; }
+
+/* ---- footer ---- */
+.site-footer { max-width: var(--maxw); margin: 60px auto 0; padding: 40px clamp(16px,5vw,42px) 56px; border-top: 1px solid var(--line); text-align: center; }
+.foot-mark { font-family: var(--display); letter-spacing: .14em; font-size: 1.1rem; color: var(--soft); margin: 0 0 10px; }
+.foot-note { color: var(--mute); font-size: .8rem; font-weight: 300; max-width: 560px; margin: 0 auto; }
+.foot-note strong { color: var(--soft); }
+
+/* ---- sound toggle ---- */
+.sound-toggle { position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom,0px)); z-index: 50; width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer; color: var(--ink); background: rgba(22,12,5,.85); border: 1px solid var(--line-strong); border-radius: 50%; backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(0,0,0,.4); transition: transform .2s ease, color .2s ease; }
+.sound-toggle:hover { transform: translateY(-2px); color: var(--flame); }
+.sound-toggle svg { width: 20px; height: 20px; }
+
+/* ---- lightbox ---- */
+.lightbox { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(6,3,0,.92); backdrop-filter: blur(6px); padding: 30px; animation: fadePage .25s ease; }
+.lightbox[hidden] { display: none; }
+.lightbox img { max-width: 92vw; max-height: 86vh; filter: drop-shadow(0 0 40px rgba(var(--f-rgb),.5)); }
+.lb-close { position: absolute; top: 18px; right: 24px; background: none; border: 0; color: #fff; font-size: 2.4rem; cursor: pointer; opacity: .8; }
+.lb-close:hover { opacity: 1; }
+
+/* ---- the gate (easter egg) ---- */
+.voidgate { position: fixed; inset: 0; z-index: 100; background: #000; display: grid; place-items: center; overflow: hidden; opacity: 1; transition: opacity .85s ease; }
+.voidgate[hidden] { display: none; } .voidgate.closing { opacity: 0; }
+#vgfire { position: absolute; inset: 0; }
+.vg-vig { position: absolute; inset: 0; background: radial-gradient(70% 55% at 50% 46%, transparent 28%, rgba(0,0,0,.92) 100%); }
+.vg-stage { position: relative; z-index: 1; text-align: center; padding: 20px; }
+.vg-emblem { width: clamp(150px,30vw,260px); margin: 0 auto 26px; opacity: 0; filter: saturate(1.6) brightness(1.05) drop-shadow(0 0 42px rgba(255,60,10,.9)); animation: vgrise 2.2s ease forwards, emberrage .5s ease-in-out infinite 2.2s; }
+@keyframes vgrise { to { opacity: 1; } }
+@keyframes emberrage { 0%,100%{transform:translate(0,0) scale(1.05)} 25%{transform:translate(-3px,1px) scale(1.07)} 50%{transform:translate(3px,-2px)} 75%{transform:translate(-2px,-2px) scale(1.07)} }
+.vg-line { font-family: var(--display); font-size: clamp(1.5rem,5vw,2.8rem); color: #ff7a2e; text-shadow: 0 0 24px rgba(255,60,10,.6); margin: 0; opacity: 0; transition: opacity 1.5s ease; }
+.vg-line.show { opacity: 1; }
+.vg-sub { font-family: var(--serif); font-style: italic; font-size: clamp(1rem,2.5vw,1.3rem); color: #c08a62; margin: 16px 0 0; opacity: 0; transition: opacity 1.5s ease; }
+.vg-sub.show { opacity: 1; }
+.vg-close { margin-top: 36px; background: none; border: 1px solid rgba(255,110,60,.4); color: #ff8a52; border-radius: 100px; padding: 10px 22px; cursor: pointer; letter-spacing: .22em; text-transform: uppercase; font-size: .72rem; font-family: var(--sans); opacity: 0; transition: opacity 1.5s ease, background .2s ease; }
+.vg-close.show { opacity: 1; } .vg-close:hover { background: rgba(255,110,60,.14); color: #fff; }
+.shockwave { position: fixed; z-index: 102; pointer-events: none; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; border: 4px solid rgba(255,110,50,.9); box-shadow: 0 0 40px rgba(255,80,20,.9), inset 0 0 20px rgba(255,100,40,.6); transform: scale(0); }
+.shockwave.go { animation: shockexpand .9s cubic-bezier(.2,.7,.2,1) forwards; }
+@keyframes shockexpand { 0%{transform:scale(0);opacity:.95;border-width:4px} 100%{transform:scale(60);opacity:0;border-width:.5px} }
+
+/* ---- the burning (lights-out) ---- */
+body.blackout { --f-rgb: 222, 40, 18; --flame: #ff3a16; --ember: #ff2a08; --gold: #ff7a3a; --line: rgba(255,70,40,.18); --line-strong: rgba(255,60,30,.45); }
+body.blackout .scene-dim { opacity: 1; animation: redpulse 3.4s ease-in-out infinite; }
+body.blackout-deep .scene-dim { background: radial-gradient(circle 170px at var(--mx,50%) var(--my,45%), rgba(50,4,0,.08), rgba(10,0,0,.78) 40%, rgba(2,0,0,.992) 72%); }
+@keyframes redpulse { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.35)} }
+body.blackout #fire { z-index: 21; filter: saturate(1.7) brightness(1.08) hue-rotate(-18deg); transition: filter 1.4s ease; }
+body.blackout .haze { filter: blur(34px) saturate(1.6) brightness(.9) hue-rotate(-18deg); transition: filter 1.4s ease; }
+body.blackout .hero-emblem { position: relative; z-index: 25; cursor: pointer; }
+body.blackout .hero-emblem svg { filter: saturate(2.4) brightness(1.1) hue-rotate(-18deg) drop-shadow(0 0 40px rgba(255,40,10,.9)); animation: emberrage .42s ease-in-out infinite; }
+body.blackout-deep .hero-emblem svg { filter: saturate(3) brightness(1.3) hue-rotate(-20deg) drop-shadow(0 0 60px rgba(255,26,4,1)); }
+body.blackout .brand-emblem { filter: saturate(2.4) brightness(1.15) hue-rotate(-18deg) drop-shadow(0 0 12px rgba(255,40,10,.95)); transition: filter 1.4s ease; }
+body.blackout .topbar { border-bottom-color: rgba(255,80,50,.5); background: linear-gradient(180deg, rgba(24,4,0,.92), rgba(24,4,0,.4)); transition: border-color 1.4s ease, background 1.4s ease; }
+body.blackout .navlink { color: #d57a62; } body.blackout .navlink.is-active, body.blackout .brand-name { color: #ff6b4d; }
+body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-title, body.blackout .page.is-active .title-name {
+  position: relative; z-index: 25; opacity: .6; color: #ff5230 !important; -webkit-text-fill-color: #ff5230; background: none; text-shadow: 0 0 20px rgba(255,40,10,.6); animation: none; transition: color 1.4s ease, opacity 1.4s ease; }
+
+/* ---- responsive ---- */
+@media (max-width: 860px) {
+  .about { grid-template-columns: 1fr; gap: 24px; text-align: center; }
+  .about-emblem { max-width: 180px; margin: 0 auto; }
+  .stat-strip { grid-template-columns: 1fr 1fr; }
+  .split { grid-template-columns: 1fr; }
+  .challenge-grid { grid-template-columns: 1fr; gap: 34px; }
+}
+@media (max-width: 820px) {
+  .topnav { position: absolute; top: 100%; right: 0; left: 0; flex-direction: column; gap: 0; background: rgba(12,6,2,.98); border-bottom: 1px solid var(--line); max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+  .topnav.open { max-height: 420px; }
+  .navlink { padding: 15px clamp(16px,5vw,42px); text-align: left; } .navlink::after { display: none; }
+  .nav-toggle { display: block; }
+  .portal-grid { grid-template-columns: 1fr 1fr; }
+  .media-2, .earn-grid { grid-template-columns: 1fr; }
+  .owner-card { flex-direction: column; text-align: center; } .owner-main { flex-direction: column; } .owner-info .person-name, .owner-info .person-role { justify-content: center; }
+  /* mobile perf: drop the heaviest blurred layer */
+  .haze, .flicker { display: none; }
+  .topbar { backdrop-filter: none; background: rgba(10,5,2,.95); }
+}
+@media (max-width: 500px) { .portal-grid { grid-template-columns: 1fr; } .stat-strip { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } .reveal { opacity: 1; transform: none; } }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<canvas id="fire" aria-hidden="true"></canvas>
+<div class="emberglow" aria-hidden="true"></div>
+<div class="haze" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="flicker" aria-hidden="true"></div>
+<div class="scene-dim" aria-hidden="true"></div>
+
+<header class="topbar" id="topbar">
+  <button class="brand" data-page="home" aria-label="Iron Lotus — home">
+    <span class="brand-emblem" id="brandEmblem" aria-hidden="true"></span>
+    <span class="brand-name">Iron Lotus</span>
+  </button>
+  <nav class="topnav" aria-label="Primary">
+    <button class="navlink is-active" data-page="home">Home</button>
+    <button class="navlink" data-page="lore">Lore</button>
+    <button class="navlink" data-page="design">Design</button>
+    <button class="navlink" data-page="holders">Holders</button>
+    <button class="navlink" data-page="title">Title</button>
+    <button class="navlink" data-page="changelog">Changelog</button>
+  </nav>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="page is-active" id="page-home">
+    <div class="hero">
+      <div class="hero-inner">
+        <span class="hero-emblem" id="homeEmblem"></span>
+        <p class="kicker">Kizuki · Custom Weapon</p>
+        <h1 class="hero-title">Iron Lotus</h1>
+        <p class="hero-tag">A bloom forged in cinder — every petal a page set alight.</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="about">
+        <figure class="about-emblem" id="aboutEmblem" style="margin:0"></figure>
+        <div class="about-body">
+          <h2 class="h-lux">About <span class="lav">Iron Lotus</span></h2>
+          <p class="lead">
+            Drawn from the ash of a <strong>burning library</strong>, <span class="lav">Iron Lotus</span> is a blade
+            whose petals open only in flame. Where other weapons cut, it <em>reads</em> — unbinding an opponent's
+            story page by page and feeding each one to the fire. What remains is a single <span class="gold">ember bloom</span>,
+            iron-hard and never cooling.
+          </p>
+          <dl class="stat-strip" aria-label="Weapon summary">
+            <div><dt>Tier</dt><dd>Exclusive Custom</dd></div>
+            <div><dt>Name</dt><dd>Iron Lotus</dd></div>
+            <div><dt>Holders</dt><dd data-field="holder-count">—</dd></div>
+            <div><dt>Wielder</dt><dd>—</dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="portal-grid">
+        <button class="portal" data-page="lore">
+          <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h7v16H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2z"/></svg></span>
+          <h3>Lore</h3><p>The story written in fire.</p>
+        </button>
+        <button class="portal" data-page="design">
+          <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-.5-.5-2.1 2.6-2.6Z"/></svg></span>
+          <h3>Design</h3><p>Art, animation & sound.</p>
+        </button>
+        <button class="portal" data-page="holders">
+          <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+          <h3>Holders</h3><p>Who carries the bloom.</p>
+        </button>
+        <button class="portal" data-page="changelog">
+          <span class="portal-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-3 3 3 5-6"/></svg></span>
+          <h3>Changelog</h3><p>Every pass & rework.</p>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LORE -->
+  <section class="page" id="page-lore" hidden>
+    <div class="subhero"><div class="wrap">
+      <p class="kicker">Story</p>
+      <h1 class="page-title">Lore</h1>
+      <p class="page-sub">The story written in fire.</p>
+      <span class="rule"></span>
+      <div class="prose" id="lore-text"></div>
+    </div></div>
+  </section>
+
+  <!-- DESIGN -->
+  <section class="page" id="page-design" hidden>
+    <div class="subhero"><div class="wrap">
+      <p class="kicker">Art · Animation · Sound</p>
+      <h1 class="page-title">Design</h1>
+      <p class="page-sub">How Iron Lotus was shaped — and how it sounds in motion.</p>
+      <span class="rule"></span>
+
+      <h2 class="band">— The Iron Lotus —</h2>
+      <figure class="showframe">
+        <div class="frame-art" id="designEmblem"></div>
+        <figcaption class="frame-cap">A bloom of iron petals, each edged in living flame.<span class="pending">art pending</span></figcaption>
+      </figure>
+
+      <h2 class="band">— Icon —</h2>
+      <figure class="showframe">
+        <div class="frame-art" id="iconEmblem"></div>
+        <figcaption class="frame-cap">The in-game icon.<span class="pending">art pending</span></figcaption>
+      </figure>
+
+      <h2 class="band">— Animations —</h2>
+      <div class="media-2">
+        <figure class="showframe"><div class="frame-art" id="animEmblem1"></div><figcaption class="frame-cap">Idle<span class="pending">clip pending</span></figcaption></figure>
+        <figure class="showframe"><div class="frame-art" id="animEmblem2"></div><figcaption class="frame-cap">Block<span class="pending">clip pending</span></figcaption></figure>
+      </div>
+
+      <h2 class="band">— Pose & Sound —</h2>
+      <div class="split">
+        <div class="split-text">
+          <h3 class="h-lux">Pose Theme</h3>
+          <p class="pm-label">Pose Musics</p>
+          <div class="player" id="player">
+            <div class="player-bar">
+              <button class="player-toggle" id="playerToggle" aria-label="Play / pause">
+                <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+              </button>
+              <div class="player-now">
+                <span class="player-title" id="playerTitle">Ember Theme</span>
+                <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="player-vol">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+                <input type="range" id="playerVol" min="0" max="100" value="70" aria-label="Volume" />
+              </div>
+            </div>
+            <ul class="tracklist" id="tracklist"></ul>
+          </div>
+        </div>
+        <figure class="showframe"><div class="frame-art" id="poseEmblem"></div><figcaption class="frame-cap">Pose<span class="pending">clip pending</span></figcaption></figure>
+      </div>
+
+      <h2 class="band">— Informations —</h2>
+      <div class="statsheet-wrap"><table class="statsheet"><tbody id="statsheet"></tbody></table></div>
+    </div></div>
+  </section>
+
+  <!-- HOLDERS -->
+  <section class="page" id="page-holders" hidden>
+    <div class="subhero"><div class="wrap">
+      <p class="kicker">The record of Iron Lotus</p>
+      <h1 class="page-title">Holders</h1>
+      <p class="page-sub">The bloom is handed on rarely, and only to the worthy. The rest are met with fire.</p>
+      <span class="rule"></span>
+
+      <div class="list-tools"><input type="search" id="holderSearch" class="search" placeholder="Search holders & contributors…" aria-label="Search holders" /></div>
+
+      <h2 class="band">-[ Owner ]-</h2>
+      <div class="people-grid" id="owner"></div>
+
+      <h2 class="band">-[ Developers / Contributors ]-</h2>
+      <div class="people-grid" id="contributors"></div>
+
+      <h2 class="band">-[ Holders ]-</h2>
+      <div class="people-grid" id="holders"></div>
+
+      <h2 class="band band-alt">-[ Temporary Holders ]-</h2>
+      <div class="temp-line">
+        <p>Recognized for a time — until the bloom chooses another. Earned through the "Trial by Fire."</p>
+        <button class="btn-learn" data-page="challenge">Learn More →</button>
+      </div>
+
+      <h2 class="band band-danger">-[ Blacklist ]-</h2>
+      <div class="people-grid" id="blacklist"></div>
+
+      <p class="empty" id="search-empty" hidden>No one matches that search.</p>
+    </div></div>
+  </section>
+
+  <!-- SECRET CHALLENGE -->
+  <section class="page" id="page-challenge" hidden>
+    <div class="wrap challenge-wrap">
+      <button class="btn-back" data-page="holders">← Back to Holders</button>
+      <div class="challenge-grid">
+        <div class="challenge-left">
+          <h1 class="page-title ch-title">Trial<br>by Fire</h1>
+          <div class="ornament">✦</div>
+          <div class="registry">
+            <h4>Registry</h4>
+            <table><tbody>
+              <tr><td>Current Holders</td><td class="reg-flame">00</td></tr>
+              <tr><td>Trial Difficulty</td><td class="reg-gold">Extreme</td></tr>
+              <tr><td>Status</td><td class="reg-red">Coming Soon</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+        <div class="challenge-right">
+          <p>Join the Roblox group to see what it takes to be entrusted with the bloom for a time.</p>
+          <a class="big-link" href="#" target="_blank" rel="noopener">The Group — Roblox ↗</a>
+          <p>A temporary holder surrenders the bloom when they switch weapons. You may request it again at any time, so long as the trial stays completed.</p>
+          <h2 class="challenge-heading">THE CHALLENGE</h2>
+          <p class="ch-soon">Challenge details coming soon.</p>
+        </div>
+      </div>
+      <h2 class="band band-alt" style="margin-top:50px">-[ Temporary Holders ]-</h2>
+      <div class="people-grid" id="temp-holders"></div>
+    </div>
+  </section>
+
+  <!-- TITLE -->
+  <section class="page" id="page-title" hidden>
+    <div class="subhero"><div class="wrap">
+      <div class="title-crest">
+        <div class="crest-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6Z"/><path d="M12 8c-1.5 2-3 3-3 5a3 3 0 0 0 6 0c0-2-1.5-3-3-5Z"/></svg></div>
+        <p class="kicker">The Title of Iron Lotus</p>
+        <h1 class="title-name">Cinderbound</h1>
+        <p class="title-desc">A mark worn by those tied to the bloom — the ones who carry its living flame, and the ones who helped forge it.</p>
+      </div>
+      <h2 class="band">— How it's earned —</h2>
+      <div class="earn-grid">
+        <article class="earn">
+          <span class="earn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 15 4-10 4 6 4-6 4 10Z"/><path d="M4 15h16v4H4z"/></svg></span>
+          <h3>Own a copy</h3>
+          <p>Hold a copy of <strong>Iron Lotus</strong> and the title is bound to you.</p>
+        </article>
+        <article class="earn">
+          <span class="earn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-.5-.5-2.1 2.6-2.6Z"/></svg></span>
+          <h3>Contribute</h3>
+          <p>Help create the custom through design, VFX, sound, or more — or support it financially — to earn it by craft.</p>
+        </article>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- CHANGELOG -->
+  <section class="page" id="page-changelog" hidden>
+    <div class="subhero"><div class="wrap">
+      <p class="kicker">Updates</p>
+      <h1 class="page-title">Changelog</h1>
+      <p class="page-sub">Every pass, tweak, and rework — in order.</p>
+      <span class="rule"></span>
+      <div class="progress-card">
+        <span class="status-pill"><i></i> In development</span>
+        <div class="bars" id="progress-bars"></div>
+      </div>
+      <ol class="timeline" id="timeline"></ol>
+    </div></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p class="foot-mark">IRON LOTUS</p>
+  <p class="foot-note">A community showcase for a custom weapon in the Roblox game <strong>Kizuki</strong>, inspired by <strong>Library of Ruina</strong>. Fan-made and unofficial.</p>
+</footer>
+
+<button class="sound-toggle" id="soundToggle" aria-label="Toggle sound" aria-pressed="false" title="Sound on/off">
+  <svg class="ic-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+  <svg class="ic-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m17 9 4 4M21 9l-4 4"/></svg>
+</button>
+
+<div class="voidgate" id="voidgate" hidden>
+  <canvas id="vgfire" aria-hidden="true"></canvas>
+  <div class="vg-vig" aria-hidden="true"></div>
+  <div class="vg-stage">
+    <span class="vg-emblem" id="vgEmblem"></span>
+    <h2 class="vg-line">You opened a book that was still burning.</h2>
+    <p class="vg-sub">Now it reads you back.</p>
+    <button class="vg-close" id="vgClose">close the book</button>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" id="lbClose" aria-label="Close">×</button>
+  <img id="lbImg" alt="" />
+</div>
+
+<script>
+/* =========================================================
+   IRON LOTUS — content + interactions
+   Edit everything in the `data` object below.
+   ========================================================= */
+const data = {
+  lore: [
+    "There is a Library that does not lend. It takes. Every guest who crosses its threshold leaves a book behind — their life, bound in heat and ink — and the shelves have never once been full.",
+    "~For every story shelved, one is burned.",
+    "Among the ash of the oldest wing, a gardener-librarian found a seed that would not catch. It sat in the heart of a bonfire for a hundred nights and came out iron: cold, grey, patient. On the hundred-and-first night it opened.",
+    "It bloomed into a lotus of beaten metal, and from the seam of every petal crept a thin line of flame that never guttered. The librarian understood at once that this was not a flower but a {verdict} — a thing that decided which pages deserved to keep burning.",
+    "~They called it the Iron Lotus.",
+    "Raised as a blade, it does not simply cut. It reads. A single pass unbinds an opponent's story, peels it leaf from leaf, and feeds each page to the petals. What the Lotus keeps, it keeps forever; what it releases goes up as light.",
+    "~\"A book is only finished,\" the librarian wrote, \"when someone is brave enough to close it.\"",
+    "So the bloom waits on its shelf of embers, iron-cold to the hand and white-hot at the edge, for a reader willing to carry it into the next story.",
+    "~And the Library, as always, is still hungry.",
+  ],
+  owner: [
+    { name: "Owner", handle: "@owner", role: "Owner", avatar: "", profile: "#", quote: "Every great story deserves a worthy ending.", by: "— the Iron Lotus" },
+  ],
+  contributors: [
+    { name: "Divine", handle: "@DivineGaming15", role: "VFX + Website", avatar: "", profile: "https://www.roblox.com/users/2523725933/profile" },
+    { name: "Contributor", handle: "@username", role: "Concept", avatar: "", profile: "#" },
+    { name: "Contributor", handle: "@username", role: "Sound", avatar: "", profile: "#" },
+  ],
+  holders: [
+    { name: "displayname", handle: "@username", role: "Holder", avatar: "", profile: "#" },
+    { name: "displayname", handle: "@username", role: "Holder", avatar: "", profile: "#" },
+  ],
+  tempHolders: [
+    { name: "displayname", handle: "@username", role: "temp", avatar: "" },
+    { name: "displayname", handle: "@username", role: "temp", avatar: "" },
+    { name: "displayname", handle: "@username", role: "temp", avatar: "" },
+    { name: "displayname", handle: "@username", role: "temp", avatar: "" },
+  ],
+  blacklist: [
+    { name: "displayname", handle: "@username", role: "reason", avatar: "", profile: "#" },
+  ],
+  stats: [
+    ["Tier", "Exclusive Custom"], ["Type", "Katana"], ["Rarity", "Custom"],
+    ["Moveset", "Reading / Unbinding"], ["Element", "Ember"], ["Wielder", "—"],
+  ],
+  progress: [
+    { label: "Model", pct: 100 }, { label: "Animations", pct: 40 },
+    { label: "VFX", pct: 55 }, { label: "Balancing", pct: 20 },
+  ],
+  timeline: [
+    { ver: "v0.1", year: "2026", notes: ["Concept seeded — the burning-library idea.", "First model blocked out."] },
+    { ver: "v0.2", year: "2026", notes: ["Iron-petal model refined.", "Ember VFX exploration began."] },
+  ],
+  tracks: [
+    { title: "Ember Theme", demo: true },
+    { title: "Reception Hall", soon: true },
+    { title: "The Last Page", soon: true },
+  ],
+};
+
+/* ---- flaming lotus emblem (inline SVG, drawn once, reused) ---- */
+const LOTUS = `<svg viewBox="0 0 120 120" role="img" aria-label="Iron Lotus emblem">
+  <defs>
+    <linearGradient id="il-g" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#c23a0a"/><stop offset=".5" stop-color="#ff7a1a"/><stop offset="1" stop-color="#ffb84d"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#il-g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 104 C40 92 30 74 30 56 C44 62 54 76 60 96 C66 76 76 62 90 56 C90 74 80 92 60 104Z"/>
+    <path d="M60 100 C50 84 48 64 60 40 C72 64 70 84 60 100Z"/>
+    <path d="M60 96 C34 86 20 70 18 50 C34 52 48 62 60 82"/>
+    <path d="M60 96 C86 86 100 70 102 50 C86 52 72 62 60 82"/>
+    <path d="M60 40 C57 30 60 20 60 12 C60 20 63 30 60 40Z" stroke-width="2.4"/>
+  </g>
+  <circle cx="60" cy="70" r="5" fill="#ffd27a"/>
+</svg>`;
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const emph = (s) => esc(s).replace(/\{([^}]+)\}/g, '<span class="em">$1</span>');
+
+/* ---------- render ---------- */
+function render() {
+  // emblems
+  $("#homeEmblem").innerHTML = LOTUS; $("#aboutEmblem").innerHTML = LOTUS; $("#brandEmblem").innerHTML = LOTUS;
+  $("#vgEmblem").innerHTML = LOTUS;
+  ["designEmblem","iconEmblem","animEmblem1","animEmblem2","poseEmblem"].forEach((id) => { const el = $("#"+id); if (el) el.innerHTML = LOTUS; });
+
+  const lore = $("#lore-text");
+  if (lore) lore.innerHTML = data.lore.map((p) => p[0] === "~"
+    ? `<p class="lore-beat">${emph(p.slice(1).trim())}</p>` : `<p>${emph(p)}</p>`).join("");
+
+  const initial = (n) => (n && n.toLowerCase() !== "displayname" ? n[0].toUpperCase() : "?");
+  const personCard = (p, black) => {
+    const av = p.avatar ? `<img src="${esc(p.avatar)}" alt="${esc(p.name)}" loading="lazy"/>` : `<span class="ph">${esc(initial(p.name))}</span>`;
+    const handle = p.handle ? `<p class="person-handle">${esc(p.handle)}</p>` : "";
+    const role = p.role && p.role !== "temp" ? `<p class="person-role">${esc(p.role)}</p>` : "";
+    const link = p.profile && p.profile !== "#" ? `<a class="person-link" href="${esc(p.profile)}" target="_blank" rel="noopener">Roblox Profile ↗</a>` : "";
+    const key = (p.name + " " + (p.handle||"") + " " + (p.role||"")).toLowerCase();
+    return `<article class="person${black ? " is-black" : ""}" data-key="${esc(key)}">
+      <div class="person-avatar">${av}</div>
+      <h4 class="person-name">${esc(p.name)}</h4>${handle}${role}${link}</article>`;
+  };
+  const fill = (id, list, black) => { const el = $(id); if (el) el.innerHTML = list.map((p) => personCard(p, black)).join(""); };
+
+  // owner — stretched card with a quote + perimeter fire
+  const ownerEl = $("#owner");
+  if (ownerEl) ownerEl.innerHTML = data.owner.map((p) => {
+    const av = p.avatar ? `<img src="${esc(p.avatar)}" alt="${esc(p.name)}" loading="lazy"/>` : `<span class="ph">${esc(initial(p.name))}</span>`;
+    const handle = p.handle ? `<p class="person-handle">${esc(p.handle)}</p>` : "";
+    const role = p.role ? `<p class="person-role">${esc(p.role)}</p>` : "";
+    const link = p.profile && p.profile !== "#" ? `<a class="person-link" href="${esc(p.profile)}" target="_blank" rel="noopener">Roblox Profile ↗</a>` : "";
+    const quote = p.quote ? `<figure class="owner-quote">“${esc(p.quote)}”${p.by ? `<span>${esc(p.by)}</span>` : ""}</figure>` : "";
+    return `<article class="person owner-card">
+      <canvas class="owner-fire" aria-hidden="true"></canvas>
+      <div class="owner-main"><div class="person-avatar">${av}</div>
+        <div class="owner-info"><h4 class="person-name">${esc(p.name)} <span class="owner-pill">Owner</span></h4>${handle}${role}${link}</div></div>
+      ${quote}</article>`;
+  }).join("");
+
+  fill("#contributors", data.contributors);
+  fill("#holders", data.holders);
+  fill("#temp-holders", data.tempHolders);
+  fill("#blacklist", data.blacklist, true);
+
+  // holder count = owner + holders
+  const count = data.holders.filter((h) => h.name.toLowerCase() !== "displayname").length + data.owner.length;
+  const hc = $('[data-field="holder-count"]'); if (hc) hc.textContent = String(count);
+
+  const sheet = $("#statsheet");
+  if (sheet) sheet.innerHTML = data.stats.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("");
+
+  const tl = $("#tracklist");
+  if (tl) tl.innerHTML = data.tracks.map((t, i) =>
+    `<li class="${t.demo ? "active" : ""}">${esc(t.title)}${t.soon ? '<span class="tk-soon">soon</span>' : (t.demo ? '<span class="tk-soon">demo</span>' : "")}</li>`).join("");
+
+  const bars = $("#progress-bars");
+  if (bars) bars.innerHTML = data.progress.map((b) =>
+    `<div class="bar"><div class="bar-top"><span>${esc(b.label)}</span><span class="pct">${b.pct}%</span></div>
+     <div class="bar-track"><div class="bar-fill" data-pct="${b.pct}"></div></div></div>`).join("");
+
+  const tline = $("#timeline");
+  if (tline) tline.innerHTML = data.timeline.map((t) =>
+    `<li class="tl-item"><div class="tl-head"><span class="tl-ver">${esc(t.ver)}</span><span class="tl-year">${esc(t.year)}</span></div>
+     <p class="tl-note">${t.notes.map((n) => `<span>— ${esc(n)}</span>`).join("")}</p></li>`).join("");
+}
+
+function animateBars() {
+  $$("#progress-bars .bar-fill").forEach((f) => { f.style.width = "0%"; });
+  requestAnimationFrame(() => setTimeout(() => {
+    $$("#progress-bars .bar-fill").forEach((f) => { f.style.width = f.dataset.pct + "%"; });
+  }, 120));
+}
+
+/* ---------- pages ---------- */
+let reReveal = () => {}, heroReset = () => {};
+function initPages() {
+  const pages = $$(".page"), links = $$(".navlink"), nav = $(".topnav"), toggle = $("#navToggle");
+  function show(name) {
+    pages.forEach((p) => { const on = p.id === `page-${name}`; p.classList.toggle("is-active", on); p.hidden = !on; });
+    links.forEach((l) => l.classList.toggle("is-active", l.dataset.page === name));
+    window.scrollTo({ top: 0 });
+    nav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false");
+    if (history.replaceState) history.replaceState(null, "", `#${name}`);
+    reReveal(name); heroReset();
+    if (name === "changelog") animateBars();
+  }
+  $$("[data-page]").forEach((el) => el.addEventListener("click", () => show(el.dataset.page)));
+  toggle.addEventListener("click", () => { const o = nav.classList.toggle("open"); toggle.setAttribute("aria-expanded", String(o)); });
+  const start = (location.hash || "").replace("#", "");
+  if (["home","lore","design","holders","title","changelog"].includes(start)) show(start);
+}
+
+/* ---------- sticky bar ---------- */
+function initBar() {
+  const bar = $("#topbar");
+  const on = () => bar.classList.toggle("is-scrolled", window.scrollY > 20);
+  on(); addEventListener("scroll", on, { passive: true });
+}
+
+/* ---------- hero parallax ---------- */
+function initParallax() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let ticking = false;
+  function update() {
+    ticking = false;
+    const page = $(".page.is-active"); if (!page) return;
+    const target = page.querySelector(".hero-inner"); if (!target) return;
+    const hero = page.querySelector(".hero"); const h = (hero && hero.offsetHeight) || 1;
+    target.style.transform = `translateY(${Math.min(window.scrollY, h) * 0.5}px)`;
+    target.style.opacity = String(Math.max(0.3, 1 - window.scrollY / (h * 1.5)));
+  }
+  addEventListener("scroll", () => { if (!ticking) { requestAnimationFrame(update); ticking = true; } }, { passive: true });
+  heroReset = () => requestAnimationFrame(update); update();
+}
+
+/* ---------- reveal ---------- */
+function initReveal() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const sel = ".portal, .person, .earn, .title-crest, .progress-card, .timeline .tl-item, .showframe, .prose p, .about, .stat-strip, .temp-line, .player, .statsheet-wrap";
+  const els = $$(sel);
+  els.forEach((el) => {
+    el.classList.add("reveal");
+    const sibs = Array.from(el.parentNode.children).filter((c) => c.matches(sel));
+    el.style.setProperty("--d", Math.min(sibs.indexOf(el), 7) * 0.06 + "s");
+  });
+  const io = new IntersectionObserver((ents) => ents.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.1, rootMargin: "0px 0px -5% 0px" });
+  els.forEach((el) => io.observe(el));
+  reReveal = (page) => $$(`#page-${page} .reveal`).forEach((el) => { el.classList.remove("in"); io.observe(el); });
+}
+
+/* ---------- search ---------- */
+function initSearch() {
+  const input = $("#holderSearch"); if (!input) return;
+  const empty = $("#search-empty");
+  const groups = ["#contributors", "#holders"].map((s) => $(s)).filter(Boolean);
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    let any = false;
+    groups.forEach((g) => g.querySelectorAll(".person").forEach((card) => {
+      const hit = !q || (card.dataset.key || "").includes(q);
+      card.style.display = hit ? "" : "none"; if (hit) any = true;
+    }));
+    if (empty) empty.hidden = !(q && !any);
+  });
+}
+
+/* ---------- lightbox ---------- */
+function initLightbox() {
+  const lb = $("#lightbox"), img = $("#lbImg"), close = $("#lbClose");
+  $$(".zoom").forEach((b) => b.addEventListener("click", () => { img.src = b.dataset.src; lb.hidden = false; }));
+  const hide = () => { lb.hidden = true; img.src = ""; };
+  close.addEventListener("click", hide);
+  lb.addEventListener("click", (e) => { if (e.target === lb) hide(); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && !lb.hidden) hide(); });
+}
+
+/* ---------- glow sprites (perf: no per-particle shadowBlur) ---------- */
+function glowSprites(colorList, size = 26) {
+  return colorList.map((c) => {
+    const s = document.createElement("canvas"); s.width = s.height = size;
+    const g = s.getContext("2d");
+    const rad = g.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+    rad.addColorStop(0, `rgba(${c},1)`); rad.addColorStop(0.35, `rgba(${c},0.55)`); rad.addColorStop(1, `rgba(${c},0)`);
+    g.fillStyle = rad; g.fillRect(0, 0, size, size);
+    return s;
+  });
+}
+const LOW_FX = matchMedia("(pointer: coarse)").matches || innerWidth < 820;
+
+/* ---------- UI click SFX — ember crackle ---------- */
+const SFX = (() => {
+  let ctx, master;
+  function ensure() { if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination); } if (ctx.state === "suspended") ctx.resume(); return ctx; }
+  function crackle(freq, q, d, v) {
+    const c = ensure(); if (!c) return; const n = c.currentTime;
+    const len = Math.ceil(c.sampleRate * d), buf = c.createBuffer(1, len, c.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = (Math.random()*2-1) * (1 - i/len);
+    const src = c.createBufferSource(); src.buffer = buf;
+    const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.setValueAtTime(freq, n); bp.frequency.exponentialRampToValueAtTime(freq*0.5, n+d); bp.Q.value = q;
+    const g = c.createGain(); g.gain.setValueAtTime(0.0001, n); g.gain.exponentialRampToValueAtTime(v, n+0.008); g.gain.exponentialRampToValueAtTime(0.0001, n+d);
+    src.connect(bp).connect(g).connect(master); src.start(n); src.stop(n+d+0.02);
+  }
+  function thump(f, d, v) {
+    const c = ensure(); if (!c) return; const n = c.currentTime;
+    const o = c.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(f, n); o.frequency.exponentialRampToValueAtTime(f*0.5, n+d);
+    const g = c.createGain(); g.gain.setValueAtTime(0.0001, n); g.gain.exponentialRampToValueAtTime(v, n+0.01); g.gain.exponentialRampToValueAtTime(0.0001, n+d);
+    o.connect(g).connect(master); o.start(n); o.stop(n+d+0.02);
+  }
+  return {
+    tap() { crackle(2200, 6, 0.08, 0.1); },
+    confirm() { crackle(1700, 5, 0.1, 0.1); thump(150, 0.18, 0.09); },
+  };
+})();
+function initSfx() {
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("button, a"); if (!el) return;
+    if (el.closest(".portal, .navlink, .brand, .btn-learn, .player-toggle")) SFX.confirm(); else SFX.tap();
+  }, true);
+}
+
+/* ---------- FIRE background ---------- */
+function initFire() {
+  const canvas = $("#fire"); if (!canvas || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const ctx = canvas.getContext("2d");
+  const colors = ["255,122,26","255,77,0","255,179,71","255,150,40","255,90,20"];
+  const sprites = glowSprites(colors);
+  let w, h, parts, embers;
+  function resize() {
+    w = canvas.width = innerWidth; h = canvas.height = innerHeight;
+    const div = LOW_FX ? 44000 : 13000, cap = LOW_FX ? 36 : 120;
+    parts = Array.from({ length: Math.min(cap, Math.floor(w*h/div)) }, () => spawn(true));
+    embers = Array.from({ length: LOW_FX ? 2 : Math.max(3, Math.round(w/560)) }, () => ({
+      x: Math.random()*w, y: Math.random()*h, r: Math.random()*150+110,
+      vx: (Math.random()-0.5)*0.22, vy: (Math.random()-0.5)*0.14,
+      a: Math.random()*0.05+0.025, t: Math.random()*Math.PI*2, tw: Math.random()*0.01+0.004,
+    }));
+  }
+  function spawn(any) {
+    return { x: Math.random()*w, y: any ? Math.random()*h : h+Math.random()*30,
+      r: Math.random()*2.2+0.5, vy: -(Math.random()*0.7+0.2), vx: (Math.random()-0.5)*0.5,
+      a: Math.random()*0.5+0.25, ci: (Math.random()*colors.length)|0,
+      sway: Math.random()*0.04+0.015, amp: Math.random()*0.8+0.3, t: Math.random()*Math.PI*2,
+      life: Math.random()*0.6+0.4, fade: Math.random()*0.004+0.0015 };
+  }
+  let last = 0;
+  function frame(ts) {
+    requestAnimationFrame(frame);
+    if (LOW_FX && ts - last < 32) return; last = ts;
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalCompositeOperation = "lighter";
+    for (const e of embers) {
+      e.t += e.tw; e.x += e.vx; e.y += e.vy;
+      if (e.x < -e.r) e.x = w+e.r; if (e.x > w+e.r) e.x = -e.r;
+      if (e.y < -e.r) e.y = h+e.r; if (e.y > h+e.r) e.y = -e.r;
+      const a = e.a*(0.6+0.4*Math.sin(e.t));
+      const g = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.r);
+      g.addColorStop(0, `rgba(255,120,30,${a})`); g.addColorStop(1, "rgba(255,120,30,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
+    }
+    for (const p of parts) {
+      p.t += p.sway; p.y += p.vy; p.x += p.vx + Math.sin(p.t)*p.amp; p.life -= p.fade;
+      if (p.y < -10 || p.life <= 0) Object.assign(p, spawn(false));
+      const flick = 0.35 + Math.abs(Math.sin(p.t*2.2))*0.65;
+      const alpha = p.a * flick * Math.max(0, Math.min(1, p.life*1.4));
+      const size = p.r*7; ctx.globalAlpha = alpha;
+      ctx.drawImage(sprites[p.ci], p.x-size/2, p.y-size/2, size, size);
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+  }
+  resize(); addEventListener("resize", resize); requestAnimationFrame(frame);
+}
+
+/* ---------- ambience: scare drone, gate drone, shockwave, type blip, pose theme, owner hover ---------- */
+const Ambience = (() => {
+  let ctx, master, scare, gate, started = false, scareNodes = [], gateNodes = [], muted = false;
+  try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = muted ? 0 : 1; master.connect(ctx.destination);
+    scare = ctx.createGain(); scare.gain.value = 0; scare.connect(master);
+    gate = ctx.createGain(); gate.gain.value = 0; gate.connect(master);
+    return ctx;
+  }
+  function noiseBuffer(sec) { const b = ctx.createBuffer(1, ctx.sampleRate*sec, ctx.sampleRate); const d = b.getChannelData(0); for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1; return b; }
+  function start() { if (started) return; if (!ensure()) return; if (ctx.state === "suspended") ctx.resume(); started = true; }
+  function setMuted(m) { muted = m; try { localStorage.setItem("il-muted", m ? "1" : "0"); } catch (e) {} if (master) master.gain.setTargetAtTime(m?0:1, ctx.currentTime, 0.05); }
+  function isMuted() { return muted; }
+
+  function enterScare() {
+    if (!ctx) return; const t = ctx.currentTime;
+    [41, 43.5, 220, 233].forEach((f, i) => {
+      const o = ctx.createOscillator(); o.type = i<2?"sine":"sawtooth"; o.frequency.value = f;
+      const g = ctx.createGain(); g.gain.value = i<2?0.5:0.05;
+      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = i<2?200:900;
+      o.connect(g).connect(lp).connect(scare); o.start(t); scareNodes.push(o);
+    });
+    const o = ctx.createOscillator(); o.type="sine"; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(32, t+0.5);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t+0.02); g.gain.exponentialRampToValueAtTime(0.0001, t+1.1);
+    o.connect(g).connect(scare); o.start(t); o.stop(t+1.2);
+    scare.gain.cancelScheduledValues(t); scare.gain.setValueAtTime(scare.gain.value, t); scare.gain.setTargetAtTime(0.14, t, 1.4);
+  }
+  function exitScare() { if (!ctx) return; const t = ctx.currentTime; scare.gain.setTargetAtTime(0, t, 1.2); scareNodes.forEach((o)=>{try{o.stop(t+2);}catch(e){}}); scareNodes = []; }
+
+  function gateStart() {
+    if (!ctx) return; const t = ctx.currentTime; scare.gain.setTargetAtTime(0, t, 0.6);
+    [41, 43.3, 58, 61.5, 174, 184, 466].forEach((f, i) => {
+      const o = ctx.createOscillator(); o.type = i<4?"sine":"triangle"; o.frequency.value = f;
+      const g = ctx.createGain(); g.gain.value = f>400?0.016:(f<70?0.34:0.07);
+      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = f>400?2200:520;
+      const d = ctx.createOscillator(); d.frequency.value = 0.05+i*0.013; const dg = ctx.createGain(); dg.gain.value = f*0.004;
+      d.connect(dg).connect(o.frequency); d.start(t);
+      o.connect(g).connect(lp).connect(gate); o.start(t); gateNodes.push(o, d);
+    });
+    const src = ctx.createBufferSource(); src.buffer = noiseBuffer(6); src.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value = 1900; bp.Q.value = 0.6;
+    const ng = ctx.createGain(); ng.gain.value = 0.013; src.connect(bp).connect(ng).connect(gate); src.start(t); gateNodes.push(src);
+    gate.gain.cancelScheduledValues(t); gate.gain.setValueAtTime(0.0001, t); gate.gain.setTargetAtTime(0.17, t, 1.6);
+  }
+  function gateStop() { if (!ctx) return; const t = ctx.currentTime; gate.gain.setTargetAtTime(0, t, 0.7); gateNodes.forEach((n)=>{try{n.stop(t+1.1);}catch(e){}}); gateNodes = []; }
+
+  function shockwave() {
+    if (!ctx || muted) return; const t = ctx.currentTime;
+    const o = ctx.createOscillator(); o.type="sine"; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(38, t+0.55);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.55, t+0.012); g.gain.exponentialRampToValueAtTime(0.0001, t+0.75);
+    o.connect(g).connect(master); o.start(t); o.stop(t+0.8);
+    const src = ctx.createBufferSource(); src.buffer = noiseBuffer(1);
+    const bp = ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.setValueAtTime(1400, t); bp.frequency.exponentialRampToValueAtTime(180, t+0.6); bp.Q.value = 0.7;
+    const ng = ctx.createGain(); ng.gain.setValueAtTime(0.0001, t); ng.gain.exponentialRampToValueAtTime(0.3, t+0.02); ng.gain.exponentialRampToValueAtTime(0.0001, t+0.7);
+    src.connect(bp).connect(ng).connect(master); src.start(t); src.stop(t+0.8);
+  }
+  function typeBlip() {
+    if (!ctx || muted) return; const t = ctx.currentTime;
+    const o = ctx.createOscillator(); o.type="square"; o.frequency.value = 150+Math.random()*26;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.08, t+0.004); g.gain.exponentialRampToValueAtTime(0.0001, t+0.07);
+    o.connect(g).connect(master); o.start(t); o.stop(t+0.09);
+  }
+
+  /* --- pose "Ember Theme": a generative warm ambient loop (play/stop + volume) --- */
+  let pose, poseNodes = [], poseOn = false, poseMel = null, poseVol = 0.7;
+  const SCALE = [0, 3, 5, 7, 10, 12, 15], BASE = 196; // G minor-ish, warm
+  function posePluck() {
+    if (!ctx) return; const t = ctx.currentTime;
+    const f = BASE * Math.pow(2, SCALE[(Math.random()*SCALE.length)|0] / 12);
+    const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 2600; lp.connect(pose);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t+0.05); g.gain.exponentialRampToValueAtTime(0.0001, t+2.4); g.connect(lp);
+    [[f,"triangle",1],[f*2,"sine",0.4]].forEach(([fr,ty,amt]) => { const o = ctx.createOscillator(); o.type = ty; o.frequency.value = fr; const og = ctx.createGain(); og.gain.value = amt; o.connect(og).connect(g); o.start(t); o.stop(t+2.5); });
+  }
+  function poseStart() {
+    if (!ensure()) return; if (ctx.state === "suspended") ctx.resume();
+    if (poseOn) return; poseOn = true;
+    pose = ctx.createGain(); pose.gain.value = 0; pose.connect(master);
+    const t = ctx.currentTime;
+    const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 500; lp.Q.value = 4; lp.connect(pose);
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.06; const lg = ctx.createGain(); lg.gain.value = 220; lfo.connect(lg).connect(lp.frequency); lfo.start(t); poseNodes.push(lfo);
+    [49, 49.4, 73.4, 98].forEach((f, i) => { const o = ctx.createOscillator(); o.type = i<2?"sine":"triangle"; o.frequency.value = f; const g = ctx.createGain(); g.gain.value = i<2?0.5:0.12; o.connect(g).connect(lp); o.start(t); poseNodes.push(o); });
+    const src = ctx.createBufferSource(); src.buffer = noiseBuffer(5); src.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value = 1200; bp.Q.value = 0.5;
+    const ng = ctx.createGain(); ng.gain.value = 0.02; src.connect(bp).connect(ng).connect(pose); src.start(t); poseNodes.push(src);
+    pose.gain.setValueAtTime(0.0001, t); pose.gain.linearRampToValueAtTime(poseVol*0.5, t+1.2);
+    poseMel = setInterval(() => { if (Math.random() < 0.7) posePluck(); }, 1500);
+  }
+  function poseStop() {
+    if (!poseOn || !pose) return; const t = ctx.currentTime;
+    pose.gain.cancelScheduledValues(t); pose.gain.setValueAtTime(pose.gain.value, t); pose.gain.linearRampToValueAtTime(0, t+0.8);
+    clearInterval(poseMel); poseMel = null;
+    const nodes = poseNodes; poseNodes = []; poseOn = false;
+    setTimeout(() => nodes.forEach((n)=>{try{n.stop();}catch(e){}}), 900);
+  }
+  function poseSetVol(v) { poseVol = v; if (pose && poseOn) pose.gain.setTargetAtTime(v*0.5, ctx.currentTime, 0.1); }
+  function poseIsOn() { return poseOn; }
+
+  /* --- owner card hover: a short warm swell --- */
+  let hv, hvNodes = [], hvOn = false, hvStop = null;
+  function hoverIn() {
+    if (!ensure()) return; if (ctx.state === "suspended") ctx.resume();
+    clearTimeout(hvStop);
+    if (!hvOn) {
+      hvOn = true; hv = ctx.createGain(); hv.gain.value = 0; hv.connect(master);
+      const t = ctx.currentTime;
+      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 600; lp.connect(hv);
+      [58, 58.6, 87, 116].forEach((f, i) => { const o = ctx.createOscillator(); o.type = i<2?"sine":"triangle"; o.frequency.value = f; const g = ctx.createGain(); g.gain.value = i<2?0.5:0.12; o.connect(g).connect(lp); o.start(t); hvNodes.push(o); });
+    }
+    const t = ctx.currentTime; hv.gain.cancelScheduledValues(t); hv.gain.setValueAtTime(hv.gain.value, t); hv.gain.linearRampToValueAtTime(0.16, t+1.2);
+  }
+  function hoverOut() {
+    if (!hv) return; const t = ctx.currentTime; hv.gain.cancelScheduledValues(t); hv.gain.setValueAtTime(hv.gain.value, t); hv.gain.linearRampToValueAtTime(0, t+1.1);
+    hvStop = setTimeout(() => { hvOn = false; const n = hvNodes; hvNodes = []; n.forEach((o)=>{try{o.stop();}catch(e){}}); }, 1300);
+  }
+
+  return { start, setMuted, isMuted, enterScare, exitScare, gateStart, gateStop, shockwave, typeBlip,
+    poseStart, poseStop, poseSetVol, poseIsOn, hoverIn, hoverOut };
+})();
+
+function initAmbience() {
+  const btn = $("#soundToggle");
+  const paint = () => { const m = Ambience.isMuted(); $(".ic-sound-on", btn).hidden = m; $(".ic-sound-off", btn).hidden = !m; btn.setAttribute("aria-pressed", String(!m)); };
+  paint();
+  const kick = () => { Ambience.start(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
+  addEventListener("pointerdown", kick); addEventListener("keydown", kick);
+  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); Ambience.setMuted(!Ambience.isMuted()); paint(); });
+
+  // owner card hover swell
+  const card = $(".owner-card");
+  if (card) { card.addEventListener("mouseenter", () => { Ambience.start(); Ambience.hoverIn(); }); card.addEventListener("mouseleave", () => Ambience.hoverOut()); }
+
+  // pose player
+  const player = $("#player"), toggle = $("#playerToggle"), vol = $("#playerVol");
+  if (player && toggle) {
+    toggle.addEventListener("click", () => {
+      Ambience.start();
+      if (Ambience.poseIsOn()) { Ambience.poseStop(); player.classList.remove("is-playing"); }
+      else { Ambience.poseStart(); player.classList.add("is-playing"); }
+    });
+    if (vol) vol.addEventListener("input", () => Ambience.poseSetVol(vol.value / 100));
+  }
+}
+
+/* ---------- owner perimeter fire ---------- */
+function initOwnerFire() {
+  const card = $(".owner-card"); if (!card) return;
+  const canvas = $(".owner-fire", card);
+  if (!canvas || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (matchMedia("(pointer: coarse)").matches) return;
+  const ctx = canvas.getContext("2d");
+  const cols = ["255,170,60","255,120,40","255,210,130","255,90,30"];
+  const sprites = glowSprites(cols, 20);
+  let w, h, parts = [], hovering = false, raf = null, alpha = 0, acc = 0;
+  function resize() { const r = card.getBoundingClientRect(); w = canvas.width = Math.max(1, Math.round(r.width)); h = canvas.height = Math.max(1, Math.round(r.height)); }
+  function spawn() {
+    const m = 3, X = m, Y = m, W = w-2*m, H = h-2*m, per = 2*(W+H); let d = Math.random()*per, x, y;
+    if (d < W) { x = X+d; y = Y; } else if (d < W+H) { x = X+W; y = Y+(d-W); }
+    else if (d < 2*W+H) { x = X+W-(d-W-H); y = Y+H; } else { x = X; y = Y+H-(d-2*W-H); }
+    return { x, y, r: Math.random()*2.6+0.8, vy: -(Math.random()*0.8+0.25), vx: (Math.random()-0.5)*0.7, life: 1, fd: Math.random()*0.02+0.012, ci: (Math.random()*cols.length)|0, t: Math.random()*6, tw: Math.random()*0.1+0.05 };
+  }
+  function frame() {
+    ctx.clearRect(0, 0, w, h);
+    alpha += ((hovering?1:0) - alpha) * 0.08;
+    if (hovering && parts.length < 150) { acc += 4; while (acc >= 1) { parts.push(spawn()); acc -= 1; } }
+    ctx.globalCompositeOperation = "lighter";
+    for (let i = parts.length-1; i >= 0; i--) {
+      const p = parts[i]; p.t += p.tw; p.x += p.vx + Math.sin(p.t)*0.3; p.y += p.vy; p.life -= p.fd;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      const a = p.life*(0.4+Math.abs(Math.sin(p.t*2))*0.6)*alpha, size = p.r*6;
+      ctx.globalAlpha = a; ctx.drawImage(sprites[p.ci], p.x-size/2, p.y-size/2, size, size);
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+    if (alpha > 0.01 || parts.length) raf = requestAnimationFrame(frame); else raf = null;
+  }
+  function kick() { if (!raf) { resize(); raf = requestAnimationFrame(frame); } }
+  const main = document.querySelector("main");
+  card.addEventListener("mouseenter", () => { hovering = true; kick(); if (main) main.classList.add("web-shake"); });
+  card.addEventListener("mouseleave", () => { hovering = false; if (main) main.classList.remove("web-shake"); });
+  addEventListener("resize", () => { if (raf) resize(); });
+}
+
+/* ---------- the gate (easter egg) ---------- */
+function initVoidgate() {
+  const vg = $("#voidgate"); if (!vg) return;
+  const close = $("#vgClose"), line = $(".vg-line"), sub = $(".vg-sub");
+  const LINE = "You opened a book that was still burning.", SUB = "Now it reads you back.";
+  let timers = [], started = false, cancelled = false, typeTimer = null;
+  function typeText(el, text, cps, onDone) {
+    el.classList.add("show"); el.textContent = ""; let i = 0; const speed = 1000/cps;
+    (function step() {
+      if (cancelled) return;
+      if (i < text.length) { const ch = text[i++]; el.textContent += ch; if (ch.trim()) Ambience.typeBlip(); typeTimer = setTimeout(step, ch === "," || ch === "." ? speed*6 : speed); }
+      else if (onDone) onDone();
+    })();
+  }
+  function startFire() {
+    if (started || matchMedia("(prefers-reduced-motion: reduce)").matches) return; started = true;
+    const c = $("#vgfire"), x = c.getContext("2d"); let w, h, p;
+    const sp = () => ({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+.4, vy: -(Math.random()*.5+.12), vx: (Math.random()-.5)*.4, a: Math.random()*.5+.25, t: Math.random()*6, tw: Math.random()*.04+.01, life: Math.random()*.6+.4, fd: Math.random()*.004+.0015 });
+    const rs = () => { w = c.width = innerWidth; h = c.height = innerHeight; p = Array.from({ length: Math.min(90, (w*h/14000)|0) }, sp); };
+    function fr() {
+      x.clearRect(0, 0, w, h); x.globalCompositeOperation = "lighter";
+      for (const q of p) { q.t += q.tw; q.y += q.vy; q.x += q.vx + Math.sin(q.t)*.5; q.life -= q.fd;
+        if (q.y < -10 || q.life <= 0) Object.assign(q, sp(), { y: h+8 });
+        const fl = .35+Math.abs(Math.sin(q.t*2.2))*.65, al = q.a*fl*Math.max(0, Math.min(1, q.life*1.4));
+        x.beginPath(); x.arc(q.x, q.y, q.r, 0, 7); x.fillStyle = "rgba(255,110,30,"+al+")"; x.shadowBlur = 12; x.shadowColor = "rgba(255,90,20,.9)"; x.fill(); }
+      x.globalCompositeOperation = "source-over"; x.shadowBlur = 0; requestAnimationFrame(fr);
+    }
+    rs(); addEventListener("resize", rs); fr();
+  }
+  window.openVoidgate = () => {
+    vg.hidden = false; vg.classList.remove("closing"); startFire(); cancelled = false; Ambience.gateStart();
+    line.textContent = ""; sub.textContent = ""; close.classList.remove("show");
+    timers.push(setTimeout(() => { typeText(line, LINE, 20, () => { timers.push(setTimeout(() => { typeText(sub, SUB, 18, () => { timers.push(setTimeout(() => close.classList.add("show"), 600)); }); }, 800)); }); }, 2100));
+  };
+  close.addEventListener("click", () => {
+    cancelled = true; clearTimeout(typeTimer); timers.forEach(clearTimeout); timers = [];
+    Ambience.shockwave(); Ambience.gateStop();
+    const r = close.getBoundingClientRect();
+    const ring = document.createElement("div"); ring.className = "shockwave";
+    ring.style.left = (r.left+r.width/2)+"px"; ring.style.top = (r.top+r.height/2)+"px";
+    document.body.appendChild(ring); requestAnimationFrame(() => ring.classList.add("go")); setTimeout(() => ring.remove(), 950);
+    vg.classList.add("closing");
+    setTimeout(() => { vg.hidden = true; vg.classList.remove("closing"); [line, sub, close].forEach((e) => e.classList.remove("show")); }, 850);
+  });
+}
+
+/* ---------- the burning (lights-out scare every ~3 min) ---------- */
+function initBlackout() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const body = document.body, root = document.documentElement;
+  addEventListener("mousemove", (e) => { root.style.setProperty("--mx", e.clientX+"px"); root.style.setProperty("--my", e.clientY+"px"); }, { passive: true });
+  const emblem = $("#homeEmblem");
+  if (emblem) emblem.addEventListener("click", () => { if (body.classList.contains("blackout") && window.openVoidgate) window.openVoidgate(); });
+  function run() {
+    if (body.classList.contains("blackout")) return;
+    body.classList.add("blackout"); Ambience.enterScare();
+    setTimeout(() => body.classList.add("blackout-deep"), 1400);
+    setTimeout(() => { body.classList.remove("blackout-deep"); Ambience.exitScare(); setTimeout(() => body.classList.remove("blackout"), 1600); }, 7000);
+  }
+  setInterval(run, 180000);
+}
+
+/* ---------- boot ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  render(); initReveal(); initPages(); initBar(); initParallax(); initSearch();
+  initLightbox(); initSfx(); initFire(); initVoidgate(); initAmbience(); initOwnerFire(); initBlackout();
+  if ($(".page.is-active") && $(".page.is-active").id === "page-changelog") animateBars();
+});
+</script>
+</body>
+</html>
