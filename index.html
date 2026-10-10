@@ -1368,10 +1368,12 @@ function initBlackout() {
 function initTextFire() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const SEL = ".page.is-active .hero-title, .page.is-active .page-title, .page.is-active .title-name, .page.is-active .band, .page.is-active .h-lux";
+  // tight box around the actual rendered text (not the full-width element box)
+  const textRect = (el) => { try { const rg = document.createRange(); rg.selectNodeContents(el); const rc = rg.getBoundingClientRect(); if (rc.width > 1 && rc.height > 1) return rc; } catch (e) {} return el.getBoundingClientRect(); };
   // embers filling a round/oval area BEHIND the heading; the canvas tracks the heading every
   // frame so it follows scrolling (and the hero parallax) instead of staying pinned.
   function emberBurst(el) {
-    const r0 = el.getBoundingClientRect();
+    const r0 = textRect(el);
     const pad = Math.max(24, r0.height*0.7);
     const W = Math.max(8, r0.width + pad*2), H = Math.max(8, r0.height + pad*2);
     const cv = document.createElement("canvas"); cv.width = Math.round(W); cv.height = Math.round(H);
@@ -1390,7 +1392,7 @@ function initTextFire() {
         t: Math.random()*6, tw: Math.random()*0.18 + 0.1, life: 1, fade: Math.random()*0.012 + 0.009 };
     };
     function fr(now) {
-      const r = el.getBoundingClientRect();          // follow the heading (scroll + parallax)
+      const r = textRect(el);                        // follow the heading's text (scroll + parallax)
       cv.style.left = (r.left - pad) + "px"; cv.style.top = (r.top - pad) + "px";
       const el2 = now - start; x.clearRect(0, 0, cw, chh); x.globalCompositeOperation = "lighter";
       if (el2 < EMIT) for (let i = 0; i < 4; i++) parts.push(mk());
