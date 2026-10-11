@@ -2178,7 +2178,7 @@ function initRuinaGate() {
     "you will be there, lying in my sheets, O sorrow,",
     "so that you might once again attempt to enter my heart.",
   ];
-  const RUINA_TIMES = [0.6, 2.64, 8.19, 13.54, 17.65, 22.09, 26.04, 32, 36.94, 40.45, 45.6, 51.85, 58.36, 63.58, 67.41];
+  const RUINA_TIMES = [0.25, 2.64, 8.19, 13.54, 17.65, 22.09, 26.04, 32, 36.94, 40.45, 45.6, 51.85, 58.36, 63.58, 67.41];
   let LYRIC_OFFSET = 0; try { const _m = location.hash.match(/off=(-?\d+(?:\.\d+)?)/); if (_m) LYRIC_OFFSET = parseFloat(_m[1]); } catch (e) {}
   let timedLyrics = null, lastIdx = -1, buildTries = 0;
   let glitchOn = false, glitchTimer = null, glitchRevert = null, finalStarted = false, lyrTimer = null, finalSafety = null;
