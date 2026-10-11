@@ -69,6 +69,7 @@ a { color: inherit; }
 #fire { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .emberglow {
   position: fixed; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: screen; opacity: .9;
+  animation: emberpulse 7.5s ease-in-out infinite;
   background:
     radial-gradient(60% 55% at 18% 88%, rgba(var(--f-rgb),.10), transparent 70%),
     radial-gradient(60% 50% at 84% 20%, rgba(255,70,10,.08), transparent 70%);
@@ -82,6 +83,7 @@ a { color: inherit; }
   filter: blur(34px); mix-blend-mode: screen; animation: hazedrift 46s ease-in-out infinite alternate;
 }
 @keyframes hazedrift { from { transform: translate3d(-5%,1%,0) scale(1.05);} to { transform: translate3d(6%,-2%,0) scale(1.12);} }
+@keyframes emberpulse { 0%,100% { opacity: .72; } 50% { opacity: 1; } }
 .vignette {
   position: fixed; inset: 0; z-index: 3; pointer-events: none;
   background:
@@ -1132,17 +1134,23 @@ function initFire() {
   const canvas = $("#fire"); if (!canvas || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const ctx = canvas.getContext("2d");
   const glow = glowSprites(["255,172,84"], 22)[0];
+  const spark = glowSprites(["255,216,132"], 14)[0];
   const hues = ["255,120,30", "255,80,20", "255,184,74", "228,58,28", "255,142,52"];   // fire-coloured aurora
-  let w, h, curtains, embers;
+  let w, h, curtains, embers, sparks = [], sparkT = 0;
   function spawnE(any) {
     return { x: Math.random()*innerWidth, y: any ? Math.random()*innerHeight : innerHeight + 10,
       r: Math.random()*2 + 0.8, vy: -(Math.random()*0.5 + 0.2), vx: (Math.random()-0.5)*0.3,
       a: Math.random()*0.5 + 0.35, t: Math.random()*6, sway: Math.random()*0.03 + 0.015,
       amp: Math.random()*0.7 + 0.3, life: Math.random()*0.6 + 0.5, fade: Math.random()*0.003 + 0.0015 };
   }
+  function spawnSpark(bx) {
+    return { x: bx + (Math.random()-0.5)*44, y: innerHeight*0.72 + Math.random()*innerHeight*0.24,
+      vx: (Math.random()-0.5)*1.3, vy: -(Math.random()*2.7 + 1.6), g: 0.03 + Math.random()*0.02,
+      r: Math.random()*1.2 + 0.6, life: 1, fade: Math.random()*0.012 + 0.01 };
+  }
   function resize() {
     w = canvas.width = innerWidth; h = canvas.height = innerHeight;
-    const nC = LOW_FX ? 3 : 5;
+    const nC = LOW_FX ? 0 : 5;
     curtains = Array.from({ length: nC }, (_, i) => ({
       x: (i + 0.5) / nC * w + (Math.random()-0.5)*w*0.1,
       wd: w * (0.18 + Math.random()*0.16), col: hues[i % hues.length],
@@ -1160,7 +1168,8 @@ function initFire() {
     if (LOW_FX && ts - last < 32) return; last = ts;
     ctx.clearRect(0, 0, w, h);
     ctx.globalCompositeOperation = "lighter";
-    // aurora curtains — soft wavy vertical bands of fire colour, drifting & pulsing
+    // aurora curtains — soft wavy vertical bands of fire colour, drifting & pulsing (skipped on phones: canvas blur is costly)
+    if (curtains.length) {
     ctx.filter = `blur(${blurPx}px)`;
     for (const c of curtains) {
       c.phase += c.sp; c.pulse += c.pulseSp; c.x += c.drift;
@@ -1176,6 +1185,7 @@ function initFire() {
       ctx.fillStyle = g; ctx.fill();
     }
     ctx.filter = "none";
+    }
     // soft rising embers
     for (const e of embers) {
       e.t += e.sway; e.y += e.vy; e.x += e.vx + Math.sin(e.t)*e.amp*0.4; e.life -= e.fade;
@@ -1183,6 +1193,19 @@ function initFire() {
       const fl = 0.4 + Math.abs(Math.sin(e.t*2))*0.6, al = e.a * fl * Math.max(0, Math.min(1, e.life*1.4));
       const s = e.r*7; ctx.globalAlpha = al;
       ctx.drawImage(glow, e.x - s/2, e.y - s/2, s, s);
+    }
+    if (!LOW_FX) {
+      if (--sparkT <= 0 && sparks.length < 70) {
+        const bx = Math.random()*w, n = 3 + (Math.random()*4|0);
+        for (let i = 0; i < n; i++) sparks.push(spawnSpark(bx));
+        sparkT = 150 + Math.random()*210;
+      }
+      for (let i = sparks.length-1; i >= 0; i--) {
+        const p = sparks[i]; p.vy += p.g; p.x += p.vx; p.y += p.vy; p.life -= p.fade;
+        if (p.life <= 0 || p.y > h+20) { sparks.splice(i, 1); continue; }
+        const s = p.r*9; ctx.globalAlpha = Math.max(0, Math.min(1, p.life))*0.9;
+        ctx.drawImage(spark, p.x - s/2, p.y - s/2, s, s);
+      }
     }
     ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
   }
@@ -1575,7 +1598,7 @@ function initTextFire() {
     const rx = r0.width/2 + pad*0.4, ry = r0.height/2 + pad*0.85;   // filled ellipse radii
     const cols = ["255,210,110", "255,150,60", "255,110,40", "255,186,96"];
     const sp = glowSprites(cols, 16);
-    let parts = [], start = performance.now(); const EMIT = 1800;
+    let parts = [], start = performance.now(); const EMIT = LOW_FX ? 1100 : 1800;
     const mk = () => {
       const ang = Math.random()*Math.PI*2, rr = Math.sqrt(Math.random());   // uniform fill of the ellipse
       return { x: cx + Math.cos(ang)*rx*rr, y: cy + Math.sin(ang)*ry*rr,
@@ -1588,7 +1611,7 @@ function initTextFire() {
       const r = textRect(el);                        // follow the heading's text (scroll + parallax)
       cv.style.left = (r.left - pad) + "px"; cv.style.top = (r.top - pad) + "px";
       const el2 = now - start; x.clearRect(0, 0, cw, chh); x.globalCompositeOperation = "lighter";
-      if (el2 < EMIT) for (let i = 0; i < 4; i++) parts.push(mk());
+      if (el2 < EMIT) for (let i = 0; i < (LOW_FX ? 2 : 4); i++) parts.push(mk());
       for (let i = parts.length-1; i >= 0; i--) {
         const q = parts[i]; q.t += q.tw; q.x += q.vx + Math.sin(q.t)*0.2; q.y += q.vy; q.life -= q.fade;
         if (q.life <= 0) { parts.splice(i, 1); continue; }
