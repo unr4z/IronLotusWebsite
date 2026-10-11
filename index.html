@@ -2242,6 +2242,7 @@ function initRuinaGate() {
     rg.classList.add("doors-open"); finalStarted = true; rg.classList.add("final");
     rg.style.setProperty("--mx", "50%"); rg.style.setProperty("--my", "50%");
     try { Ambience.start(); } catch (e) {}
+    try { FinalMusic.setMuted(false); } catch (e) {}
     FinalMusic.play();
     let i = 0; const rec = [];
     const panel = document.createElement("div");
