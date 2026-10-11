@@ -545,7 +545,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 
 /* ---- hero god-rays + hovering fireflies ---- */
 .hero { position: relative; }
-.hero-flies { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.bg-flies { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
 .bg-rays { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; mix-blend-mode: screen; }
 .bg-rays span { position: absolute; top: -24%; height: 150%; transform-origin: top center;
   background: linear-gradient(to bottom, rgba(255,208,135,.18), rgba(255,170,80,.05) 55%, transparent 82%);
@@ -555,7 +555,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 .bg-rays span:nth-child(3) { right: 14%; width: 82px; transform: rotate(27deg); animation-delay: 2.9s; }
 .bg-rays span:nth-child(4) { right: 3%; width: 130px; transform: rotate(33deg); animation-delay: .8s; }
 @keyframes rayglow { 0% { opacity: .2; } 100% { opacity: .68; } }
-.hero-flies span { position: absolute; border-radius: 50%; will-change: transform, opacity;
+.bg-flies span { position: absolute; border-radius: 50%; will-change: transform, opacity;
   background: radial-gradient(circle, rgba(255,230,160,.95), rgba(255,185,95,.55) 45%, transparent 72%);
   box-shadow: 0 0 8px 2px rgba(255,190,100,.45); opacity: 0;
   animation: fly var(--dur,8s) ease-in-out infinite; }
@@ -581,6 +581,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 </button>
 <div class="bg-scene" aria-hidden="true"></div>
 <div class="bg-rays" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+<div class="bg-flies" id="heroFlies" aria-hidden="true"></div>
 <canvas id="fire" aria-hidden="true"></canvas>
 <div class="emberglow" aria-hidden="true"></div>
 <div class="haze" aria-hidden="true"></div>
@@ -606,7 +607,6 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
   <!-- HOME -->
   <section class="page is-active" id="page-home">
     <div class="hero">
-      <div class="hero-flies" id="heroFlies" aria-hidden="true"></div>
       <div class="hero-inner">
         <span class="hero-emblem" id="homeEmblem"></span>
         <p class="kicker">Kizuki · Custom Weapon</p>
