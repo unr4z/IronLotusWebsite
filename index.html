@@ -1624,6 +1624,8 @@ const ChallengeMusic = (() => {
   };
 })();
 
+Jukebox.register("challenge", () => ChallengeMusic.stop());
+
 const RuinaMusic = (() => {
   const VIDEO = "qh7CFsnfdpk", VOL = 12;   // Library of Ruina event track (quiet)
   let player = null, ready = false, failed = false, loading = false, on = false, muted = false;
@@ -2091,6 +2093,7 @@ function initRuinaGate() {
     clearTimeout(typeTimer); timers.forEach(clearTimeout); timers = [];
     try { Ambience.shockwave(); } catch (e) {}
     Jukebox.stop("ruina"); teardown();
+    if (document.body.classList.contains("on-challenge")) { try { Jukebox.start("challenge"); ChallengeMusic.play(); } catch (e) {} }
   }
   Jukebox.register("ruina", () => { if (!open) { RuinaMusic.stop(); return; } open = false; cancelled = true; clearTimeout(typeTimer); timers.forEach(clearTimeout); timers = []; teardown(); });
   window.openRuinaGate = () => {
@@ -2109,7 +2112,7 @@ function initRuinaGate() {
     cancelled = true; clearTimeout(typeTimer); timers.forEach(clearTimeout); timers = [];
     stopBeats();
     try { Ambience.pageOpen(); } catch (e) {}
-    try { RuinaMusic.stop(); Jukebox.stop("ruina"); } catch (e) {}
+    try { RuinaMusic.stop(); BgMusic.setDucked(true); } catch (e) {}
     const bg = rg.querySelector(".rg-bg"); if (bg) bg.style.display = "none";
     const dk = rg.querySelector(".rg-dark"); if (dk) dk.style.background = "#000";
     const stg = rg.querySelector(".rg-stage"); if (stg) { stg.style.transition = "opacity .8s ease"; stg.style.opacity = "0"; }
