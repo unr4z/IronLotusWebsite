@@ -376,7 +376,10 @@ main.web-shake { animation: webshake .5s ease-in-out infinite; }
 .foot-note strong { color: var(--soft); }
 
 /* ---- sound toggle ---- */
-.sound-toggle { position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom,0px)); z-index: 50; width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer; color: var(--ink); background: rgba(22,12,5,.85); border: 1px solid var(--line-strong); border-radius: 50%; backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(0,0,0,.4); transition: transform .2s ease, color .2s ease; }
+.sound-ctl { position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom,0px)); z-index: 50; display: flex; align-items: center; gap: 9px; }
+.sound-toggle { flex: none; width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer; color: var(--ink); background: rgba(22,12,5,.85); border: 1px solid var(--line-strong); border-radius: 50%; backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(0,0,0,.4); transition: transform .2s ease, color .2s ease; }
+.sound-vol { width: 0; opacity: 0; height: 4px; margin: 0; accent-color: var(--flame); cursor: pointer; transition: width .28s ease, opacity .2s ease; }
+.sound-ctl:hover .sound-vol, .sound-ctl:focus-within .sound-vol { width: 94px; opacity: 1; }
 .sound-toggle:hover { transform: translateY(-2px); color: var(--flame); }
 .sound-toggle svg { width: 20px; height: 20px; }
 
@@ -818,10 +821,13 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
   <p class="foot-note">A community showcase for a custom weapon in the Roblox game <strong>Kizuki</strong>, inspired by <strong>Library of Ruina</strong>. Fan-made and unofficial.</p>
 </footer>
 
+<div class="sound-ctl" id="soundCtl">
 <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound" aria-pressed="false" title="Sound on/off">
   <svg class="ic-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
   <svg class="ic-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m17 9 4 4M21 9l-4 4"/></svg>
 </button>
+<input type="range" class="sound-vol" id="bgVol" min="0" max="100" value="4" aria-label="Music volume" />
+</div>
 
 <div class="voidgate" id="voidgate" hidden>
   <canvas id="vgfire" aria-hidden="true"></canvas>
@@ -1408,9 +1414,18 @@ const PosePlayer = (() => {
 })();
 
 const BgMusic = (() => {
-  const VIDEO = "xyAqyiwe9A4", VOL = 6;   // quiet looping background music
-  let player = null, ready = false, failed = false, loading = false, muted = false, pauseN = 0;
+  const VIDEO = "xyAqyiwe9A4";   // quiet looping background music
+  let VOL = 4; try { const _v = parseInt(localStorage.getItem("il-vol"), 10); if (!isNaN(_v)) VOL = _v; } catch (e) {}
+  let player = null, ready = false, failed = false, loading = false, muted = false, pauseN = 0, gestured = false;
   try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
+  function apply() {
+    if (!player || !ready) return;
+    try {
+      player.setVolume(VOL);
+      (gestured && !muted && pauseN === 0) ? player.unMute() : player.mute();
+      if (pauseN === 0) player.playVideo(); else player.pauseVideo();
+    } catch (e) {}
+  }
   function load() {
     if (loading) return; loading = true;
     if (window.YT && window.YT.Player) { create(); return; }
@@ -1422,19 +1437,22 @@ const BgMusic = (() => {
     const host = document.createElement("div"); host.id = "ytBg"; host.style.cssText = "position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;"; document.body.appendChild(host);
     try {
       player = new YT.Player(host, { videoId: VIDEO,
-        playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, loop: 1, playlist: VIDEO },
+        playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, loop: 1, playlist: VIDEO },
         events: {
-          onReady: () => { ready = true; try { muted ? player.mute() : player.unMute(); player.setVolume(muted ? 0 : VOL); if (pauseN === 0) player.playVideo(); } catch (e) {} },
+          onReady: () => { ready = true; apply(); },
           onError: () => { failed = true; },
           onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED) { try { player.seekTo(0, true); player.playVideo(); } catch (err) {} } },
         } });
     } catch (e) { failed = true; }
   }
   return {
-    start() { if (!player && !failed) load(); else if (player && ready && !muted && pauseN === 0) { try { player.unMute(); player.setVolume(VOL); player.playVideo(); } catch (e) {} } },
-    setMuted(m) { muted = m; if (player && ready) { try { if (m) { player.mute(); } else { player.unMute(); player.setVolume(VOL); if (pauseN === 0) player.playVideo(); } } catch (e) {} } },
-    pause() { pauseN++; if (player && ready) { try { player.pauseVideo(); } catch (e) {} } },
-    resume() { pauseN = Math.max(0, pauseN - 1); if (pauseN === 0 && player && ready && !muted) { try { player.setVolume(VOL); player.playVideo(); } catch (e) {} } },
+    preload() { if (!player && !failed) load(); },
+    start() { gestured = true; if (!player && !failed) load(); else apply(); },
+    setMuted(m) { muted = m; apply(); },
+    pause() { pauseN++; apply(); },
+    resume() { pauseN = Math.max(0, pauseN - 1); apply(); },
+    setVol(v) { VOL = Math.max(0, Math.min(100, v | 0)); try { localStorage.setItem("il-vol", String(VOL)); } catch (e) {} if (player && ready) { try { player.setVolume(VOL); } catch (e) {} } },
+    getVol() { return VOL; },
   };
 })();
 
@@ -1442,9 +1460,12 @@ function initAmbience() {
   const btn = $("#soundToggle");
   const paint = () => { const m = Ambience.isMuted(); $(".ic-sound-on", btn).toggleAttribute("hidden", m); $(".ic-sound-off", btn).toggleAttribute("hidden", !m); btn.setAttribute("aria-pressed", String(!m)); };
   paint();
+  BgMusic.preload();
   const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); BgMusic.start(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
   addEventListener("pointerdown", kick); addEventListener("keydown", kick);
   btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); BgMusic.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); BgMusic.setMuted(m); paint(); });
+  const bgVol = $("#bgVol");
+  if (bgVol) { try { bgVol.value = BgMusic.getVol(); } catch (e) {} bgVol.addEventListener("input", (e) => { e.stopPropagation(); BgMusic.start(); BgMusic.setVol(+bgVol.value); }); bgVol.addEventListener("click", (e) => e.stopPropagation()); }
 
   // owner card hover plays the chosen theme via YouTube's embed; synth is the fallback
   const card = $(".owner-card");
