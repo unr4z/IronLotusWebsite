@@ -1314,7 +1314,7 @@ const Ambience = (() => {
    On the hosted site this plays the chosen track on hover; if the embed can't load (e.g. the
    artifact preview blocks YouTube), the owner hover falls back to the synth swell above.        */
 const HoverTune = (() => {
-  const VIDEO = "xyAqyiwe9A4", START = 0, TARGET = 15;
+  const VIDEO = "d1ltfEtDi5U", START = 0, TARGET = 15;
   let player = null, ready = false, failed = false, loading = false, hovering = false, fadeTimer = null, vol = 0, pendingFade = false;
   let muted = false; try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
   function load() {
@@ -1407,13 +1407,42 @@ const PosePlayer = (() => {
   };
 })();
 
+const BgMusic = (() => {
+  const VIDEO = "xyAqyiwe9A4", VOL = 10;   // quiet looping background music
+  let player = null, ready = false, failed = false, loading = false, muted = false;
+  try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
+  function load() {
+    if (loading) return; loading = true;
+    if (window.YT && window.YT.Player) { create(); return; }
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { if (prev) { try { prev(); } catch (e) {} } create(); };
+    const tag = document.createElement("script"); tag.src = "https://www.youtube.com/iframe_api"; tag.onerror = () => { failed = true; }; document.head.appendChild(tag);
+  }
+  function create() {
+    const host = document.createElement("div"); host.id = "ytBg"; host.style.cssText = "position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;"; document.body.appendChild(host);
+    try {
+      player = new YT.Player(host, { videoId: VIDEO,
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, loop: 1, playlist: VIDEO },
+        events: {
+          onReady: () => { ready = true; try { muted ? player.mute() : player.unMute(); player.setVolume(muted ? 0 : VOL); player.playVideo(); } catch (e) {} },
+          onError: () => { failed = true; },
+          onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED) { try { player.seekTo(0, true); player.playVideo(); } catch (err) {} } },
+        } });
+    } catch (e) { failed = true; }
+  }
+  return {
+    start() { if (!player && !failed) load(); else if (player && ready && !muted) { try { player.unMute(); player.setVolume(VOL); player.playVideo(); } catch (e) {} } },
+    setMuted(m) { muted = m; if (player && ready) { try { m ? player.mute() : (player.unMute(), player.setVolume(VOL), player.playVideo()); } catch (e) {} } },
+  };
+})();
+
 function initAmbience() {
   const btn = $("#soundToggle");
   const paint = () => { const m = Ambience.isMuted(); $(".ic-sound-on", btn).hidden = m; $(".ic-sound-off", btn).hidden = !m; btn.setAttribute("aria-pressed", String(!m)); };
   paint();
-  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
+  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); BgMusic.start(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
   addEventListener("pointerdown", kick); addEventListener("keydown", kick);
-  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); paint(); });
+  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); BgMusic.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); BgMusic.setMuted(m); paint(); });
 
   // owner card hover plays the chosen theme via YouTube's embed; synth is the fallback
   const card = $(".owner-card");
