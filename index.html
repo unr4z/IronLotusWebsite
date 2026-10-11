@@ -270,7 +270,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border: 0; bord
 
 /* ---- owner stretched card ---- */
 #owner { grid-template-columns: 1fr; }
-.owner-card { display: flex; align-items: center; gap: 34px; text-align: left; padding: 26px 32px; border-color: rgba(255,184,77,.4); overflow: hidden; position: relative; }
+.owner-card { display: flex; align-items: center; gap: 26px; text-align: left; padding: 20px 26px; max-width: 720px; margin: 0 auto; border-color: rgba(255,184,77,.4); overflow: hidden; position: relative; }
 .owner-card:hover { transform: none; border-color: rgba(255,184,77,.75); box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 30px rgba(255,150,60,.25); }
 .owner-main { display: flex; align-items: center; gap: 22px; flex: none; position: relative; z-index: 1; }
 .owner-card .person-avatar { margin: 0; border-color: rgba(255,184,77,.55); }
@@ -538,8 +538,8 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 .trial-row:nth-child(2) .trial-rank { background-image: linear-gradient(180deg, #ffbf6a, #ff7a1e); filter: drop-shadow(0 0 9px rgba(255,120,30,.7)); }
 .trial-row:nth-child(3) .trial-rank { background-image: linear-gradient(180deg, #ffe7a4, #ffb347); filter: drop-shadow(0 0 8px rgba(255,180,70,.6)); }
 .owner-quote-img { display: flex; justify-content: center; align-items: center; }
-.owner-quote-img img { max-width: 340px; width: 100%; height: auto; filter: drop-shadow(0 6px 22px rgba(0,0,0,.5)); }
-@media (max-width: 760px) { .owner-quote-img img { max-width: 280px; } }
+.owner-quote-img img { max-width: 230px; width: 100%; height: auto; filter: drop-shadow(0 6px 22px rgba(0,0,0,.5)); }
+@media (max-width: 760px) { .owner-quote-img img { max-width: 200px; } }
 </style>
 </head>
 <body>
@@ -1316,7 +1316,7 @@ const Ambience = (() => {
    On the hosted site this plays the chosen track on hover; if the embed can't load (e.g. the
    artifact preview blocks YouTube), the owner hover falls back to the synth swell above.        */
 const HoverTune = (() => {
-  const VIDEO = "xyAqyiwe9A4", START = 0, TARGET = 28;
+  const VIDEO = "xyAqyiwe9A4", START = 0, TARGET = 15;
   let player = null, ready = false, failed = false, loading = false, hovering = false, fadeTimer = null, vol = 0, pendingFade = false;
   let muted = false; try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
   function load() {
