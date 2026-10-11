@@ -1009,6 +1009,7 @@ function initPages() {
     window.scrollTo({ top: 0 });
     nav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false");
     if (history.replaceState) history.replaceState(null, "", `#${name}`);
+    if (name === "challenge") { Jukebox.start("challenge"); ChallengeMusic.play(); } else { ChallengeMusic.stop(); Jukebox.stop("challenge"); }
     reReveal(name); heroReset();
   }
   $$("[data-page]").forEach((el) => el.addEventListener("click", () => show(el.dataset.page)));
@@ -1320,7 +1321,7 @@ const Ambience = (() => {
    On the hosted site this plays the chosen track on hover; if the embed can't load (e.g. the
    artifact preview blocks YouTube), the owner hover falls back to the synth swell above.        */
 const HoverTune = (() => {
-  const VIDEO = "d1ltfEtDi5U", START = 0, TARGET = 15;
+  const VIDEO = "0r2GNWvkd4U", START = 0, TARGET = 15;
   let player = null, ready = false, failed = false, loading = false, hovering = false, fadeTimer = null, vol = 0, pendingFade = false;
   let muted = false; try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
   function load() {
@@ -1403,6 +1404,7 @@ const PosePlayer = (() => {
   return {
     warm() { if (!player && !failed) load(); },
     toggle() { playing = !playing; if (playing) { if (!player) load(); else if (ready) go(); } else if (player && ready) { try { player.pauseVideo(); } catch (e) {} } return playing; },
+    stop() { playing = false; if (player && ready) { try { player.pauseVideo(); } catch (e) {} } },
     setVol(v) { vol = v; if (player && ready && !muted) { try { player.setVolume(v); } catch (e) {} } },
     setMuted(m) { muted = m; if (player && ready) { try { m ? player.mute() : (player.unMute(), player.setVolume(vol)); } catch (e) {} } },
     failed() { return failed; },
@@ -1416,14 +1418,14 @@ const PosePlayer = (() => {
 const BgMusic = (() => {
   const VIDEO = "xyAqyiwe9A4";   // quiet looping background music
   let VOL = 4; try { const _v = parseInt(localStorage.getItem("il-vol"), 10); if (!isNaN(_v)) VOL = _v; } catch (e) {}
-  let player = null, ready = false, failed = false, loading = false, muted = false, pauseN = 0, gestured = false;
+  let player = null, ready = false, failed = false, loading = false, muted = false, ducked = false, gestured = false;
   try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
   function apply() {
     if (!player || !ready) return;
     try {
       player.setVolume(VOL);
-      (gestured && !muted && pauseN === 0) ? player.unMute() : player.mute();
-      if (pauseN === 0) player.playVideo(); else player.pauseVideo();
+      (gestured && !muted && !ducked) ? player.unMute() : player.mute();
+      if (ducked) player.pauseVideo(); else player.playVideo();
     } catch (e) {}
   }
   function load() {
@@ -1449,10 +1451,57 @@ const BgMusic = (() => {
     preload() { if (!player && !failed) load(); },
     start() { gestured = true; if (!player && !failed) load(); else apply(); },
     setMuted(m) { muted = m; apply(); },
-    pause() { pauseN++; apply(); },
-    resume() { pauseN = Math.max(0, pauseN - 1); apply(); },
+    setDucked(d) { ducked = d; apply(); },
     setVol(v) { VOL = Math.max(0, Math.min(100, v | 0)); try { localStorage.setItem("il-vol", String(VOL)); } catch (e) {} if (player && ready) { try { player.setVolume(VOL); } catch (e) {} } },
     getVol() { return VOL; },
+  };
+})();
+
+const Jukebox = (() => {
+  let active = null; const stoppers = {};
+  return {
+    register(name, fn) { stoppers[name] = fn; },
+    start(name) { if (active && active !== name && stoppers[active]) { try { stoppers[active](); } catch (e) {} } active = name; BgMusic.setDucked(true); },
+    stop(name) { if (active === name) { active = null; BgMusic.setDucked(false); } },
+  };
+})();
+
+const ChallengeMusic = (() => {
+  const VIDEO = "d1ltfEtDi5U", VOL = 32;   // Trial by Fire page track
+  let player = null, ready = false, failed = false, loading = false, on = false, muted = false;
+  try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
+  function apply() {
+    if (!player || !ready) return;
+    try {
+      player.setVolume(muted ? 0 : VOL);
+      if (on) { muted ? player.mute() : player.unMute(); player.playVideo(); } else { player.pauseVideo(); }
+    } catch (e) {}
+  }
+  function load() {
+    if (loading) return; loading = true;
+    if (window.YT && window.YT.Player) { create(); return; }
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { if (prev) { try { prev(); } catch (e) {} } create(); };
+    const tag = document.createElement("script"); tag.src = "https://www.youtube.com/iframe_api"; tag.onerror = () => { failed = true; }; document.head.appendChild(tag);
+  }
+  function create() {
+    const host = document.createElement("div"); host.id = "ytChal"; host.style.cssText = "position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;"; document.body.appendChild(host);
+    try {
+      player = new YT.Player(host, { videoId: VIDEO,
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, loop: 1, playlist: VIDEO },
+        events: {
+          onReady: () => { ready = true; apply(); },
+          onError: () => { failed = true; },
+          onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED) { try { player.seekTo(0, true); player.playVideo(); } catch (err) {} } },
+        } });
+    } catch (e) { failed = true; }
+  }
+  return {
+    warm() { if (!player && !failed) load(); },
+    play() { on = true; if (!player && !failed) load(); else apply(); },
+    stop() { on = false; if (player && ready) { try { player.pauseVideo(); } catch (e) {} } },
+    setMuted(m) { muted = m; apply(); },
+    failed() { return failed; },
   };
 })();
 
@@ -1461,17 +1510,18 @@ function initAmbience() {
   const paint = () => { const m = Ambience.isMuted(); $(".ic-sound-on", btn).toggleAttribute("hidden", m); $(".ic-sound-off", btn).toggleAttribute("hidden", !m); btn.setAttribute("aria-pressed", String(!m)); };
   paint();
   BgMusic.preload();
-  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); BgMusic.start(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
+  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); BgMusic.start(); ChallengeMusic.warm(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
   addEventListener("pointerdown", kick); addEventListener("keydown", kick);
-  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); BgMusic.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); BgMusic.setMuted(m); paint(); });
+  btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); BgMusic.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); BgMusic.setMuted(m); ChallengeMusic.setMuted(m); paint(); });
   const bgVol = $("#bgVol");
   if (bgVol) { try { bgVol.value = BgMusic.getVol(); } catch (e) {} bgVol.addEventListener("input", (e) => { e.stopPropagation(); BgMusic.start(); BgMusic.setVol(+bgVol.value); }); bgVol.addEventListener("click", (e) => e.stopPropagation()); }
 
   // owner card hover plays the chosen theme via YouTube's embed; synth is the fallback
   const card = $(".owner-card");
   if (card) {
-    card.addEventListener("mouseenter", () => { Ambience.start(); BgMusic.pause(); if (!HoverTune.enter()) Ambience.hoverIn(); });
-    card.addEventListener("mouseleave", () => { HoverTune.leave(); Ambience.hoverOut(); BgMusic.resume(); });
+    Jukebox.register("hover", () => { HoverTune.leave(); Ambience.hoverOut(); });
+    card.addEventListener("mouseenter", () => { Ambience.start(); Jukebox.start("hover"); if (!HoverTune.enter()) Ambience.hoverIn(); });
+    card.addEventListener("mouseleave", () => { HoverTune.leave(); Ambience.hoverOut(); Jukebox.stop("hover"); });
   }
 
   // pose player
@@ -1480,16 +1530,17 @@ function initAmbience() {
   const fmt = (s) => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s/60) + ":" + String(s%60).padStart(2, "0"); };
   let scrubbing = false;
   if (player && toggle) {
+    Jukebox.register("pose", () => { if (!PosePlayer.failed()) PosePlayer.stop(); else Ambience.poseStop(); player.classList.remove("is-playing"); });
     toggle.addEventListener("click", () => {
       Ambience.start();
       if (!PosePlayer.failed()) {
         const on = PosePlayer.toggle();   // YouTube track
         player.classList.toggle("is-playing", on);
-        if (on) BgMusic.pause(); else BgMusic.resume();
+        if (on) Jukebox.start("pose"); else Jukebox.stop("pose");
       } else {
         // fallback to the synth theme (e.g. artifact preview where YouTube is blocked)
-        if (Ambience.poseIsOn()) { Ambience.poseStop(); player.classList.remove("is-playing"); BgMusic.resume(); }
-        else { Ambience.poseStart(); player.classList.add("is-playing"); BgMusic.pause(); }
+        if (Ambience.poseIsOn()) { Ambience.poseStop(); player.classList.remove("is-playing"); Jukebox.stop("pose"); }
+        else { Ambience.poseStart(); player.classList.add("is-playing"); Jukebox.start("pose"); }
       }
     });
     if (vol) vol.addEventListener("input", () => { PosePlayer.setVol(+vol.value); Ambience.poseSetVol(vol.value / 100); });
