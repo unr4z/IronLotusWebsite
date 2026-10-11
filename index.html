@@ -571,7 +571,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
               </div>
               <div class="player-vol">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
-                <input type="range" id="playerVol" min="0" max="100" value="35" aria-label="Volume" />
+                <input type="range" id="playerVol" min="0" max="100" value="20" aria-label="Volume" />
               </div>
             </div>
             <ul class="tracklist" id="tracklist"></ul>
@@ -1258,7 +1258,7 @@ const HoverTune = (() => {
 /* ---------- pose-theme player — plays the chosen track via YouTube's embed (synth fallback) ---------- */
 const PosePlayer = (() => {
   const VIDEO = "LxduFWbbndE";
-  let player = null, ready = false, failed = false, loading = false, playing = false, vol = 35, muted = false;
+  let player = null, ready = false, failed = false, loading = false, playing = false, vol = 20, muted = false;
   try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
   function load() {
     if (loading) return; loading = true;
