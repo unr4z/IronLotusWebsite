@@ -1535,10 +1535,7 @@ function initAmbience() {
   const paint = () => { const m = Ambience.isMuted(); $(".ic-sound-on", btn).toggleAttribute("hidden", m); $(".ic-sound-off", btn).toggleAttribute("hidden", !m); btn.setAttribute("aria-pressed", String(!m)); };
   paint();
   BgMusic.preload();
-  const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); BgMusic.start(); ChallengeMusic.warm(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
-  addEventListener("pointerdown", kick); addEventListener("keydown", kick);
-  const ensureBg = () => { BgMusic.start(); if (BgMusic.isPlaying()) { removeEventListener("pointerdown", ensureBg); removeEventListener("keydown", ensureBg); } };
-  addEventListener("pointerdown", ensureBg); addEventListener("keydown", ensureBg);
+  // Audio starts only from the Enter gate button (see initEnterGate).
   btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); BgMusic.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); BgMusic.setMuted(m); ChallengeMusic.setMuted(m); paint(); });
   const bgVol = $("#bgVol");
   if (bgVol) { try { bgVol.value = BgMusic.getVol(); } catch (e) {} bgVol.addEventListener("input", (e) => { e.stopPropagation(); BgMusic.start(); BgMusic.setVol(+bgVol.value); }); bgVol.addEventListener("click", (e) => e.stopPropagation()); }
@@ -1911,12 +1908,13 @@ function initEnterGate() {
     try { SFX.prime(); } catch (e) {}
     try { HoverTune.warm(); PosePlayer.warm(); ChallengeMusic.warm(); } catch (e) {}
     try { BgMusic.start(); } catch (e) {}
+    let bgTries = 0;
+    const bgRetry = setInterval(() => { try { BgMusic.start(); } catch (e) {} if (BgMusic.isPlaying() || ++bgTries > 10) clearInterval(bgRetry); }, 500);
     gate.classList.add("gone");
     setTimeout(() => { if (gate.parentNode) gate.parentNode.removeChild(gate); }, 850);
   };
   const btn = $("#enterBtn");
   if (btn) btn.addEventListener("click", go);
-  gate.addEventListener("click", (e) => { if (e.target === gate || e.target === btn) go(); });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
