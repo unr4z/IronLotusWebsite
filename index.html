@@ -2064,7 +2064,6 @@ function initRuinaGate() {
     cancelled = true; clearTimeout(typeTimer); timers.forEach(clearTimeout); timers = [];
     stopBeats();
     try { RuinaMusic.stop(); Jukebox.stop("ruina"); } catch (e) {}
-    try { Ambience.setMuted(true); BgMusic.setMuted(true); ChallengeMusic.setMuted(true); HoverTune.setMuted(true); } catch (e) {}
     const bg = rg.querySelector(".rg-bg"); if (bg) bg.style.display = "none";
     const dk = rg.querySelector(".rg-dark"); if (dk) dk.style.background = "#000";
     const stg = rg.querySelector(".rg-stage"); if (stg) { stg.style.transition = "opacity .8s ease"; stg.style.opacity = "0"; }
