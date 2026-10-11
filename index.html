@@ -1700,8 +1700,9 @@ function initWeaponViewer() {
 /* ---------- community / live member count ---------- */
 function initCommunity() {
   // ===== community (Discord) =====
-  const INVITE = "ymftgbtsY9";        // discord.gg/<INVITE> -> live member + online counts
-  const GUILD  = "1558816301340688426";  // Server ID -> widget online-count fallback
+  const INVITE  = "ymftgbtsY9";                                       // discord.gg/<INVITE>
+  const GUILD   = "1558816301340688426";                              // Server ID (widget fallback)
+  const COUNTER = "https://ironlotusbot.1nixe-ii654fe3.workers.dev/"; // Cloudflare Worker -> live total members
   const join = $("#communityJoin"), count = $("#communityCount");
   if (join) join.href = "https://discord.gg/" + INVITE;
   if (!count) return;
@@ -1709,20 +1710,25 @@ function initCommunity() {
     if (total != null) count.innerHTML = `<b>${total.toLocaleString()}</b> members` + (online != null ? ` <span class="online">· ${online.toLocaleString()} online</span>` : "");
     else if (online != null) count.innerHTML = `<b class="online">${online.toLocaleString()}</b> online`;
   };
-  const refresh = () => {
-    fetch(`https://discord.com/api/v9/invites/${INVITE}?with_counts=true`, { headers: { Accept: "application/json" } })
+  const widget = () => {
+    if (!GUILD) return;
+    fetch(`https://discord.com/api/guilds/${GUILD}/widget.json`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((d) => show(null, d.presence_count != null ? d.presence_count : (Array.isArray(d.members) ? d.members.length : null)))
+      .catch(() => {});
+  };
+  const invite = () => fetch(`https://discord.com/api/v9/invites/${INVITE}?with_counts=true`, { headers: { Accept: "application/json" } })
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((d) => show(d.approximate_member_count, d.approximate_presence_count))
-      .catch(() => {
-        if (!GUILD) return;
-        fetch(`https://discord.com/api/guilds/${GUILD}/widget.json`)
-          .then((r) => r.ok ? r.json() : Promise.reject())
-          .then((d) => show(null, d.presence_count != null ? d.presence_count : (Array.isArray(d.members) ? d.members.length : null)))
-          .catch(() => {});
-      });
+      .catch(widget);
+  const refresh = () => {
+    fetch(COUNTER)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((d) => { if (d && (d.members != null || d.online != null)) show(d.members, d.online); else invite(); })
+      .catch(invite);
   };
   refresh();
-  setInterval(refresh, 90000);        // auto-updates while the page is open
+  setInterval(refresh, 60000);        // auto-updates while the page is open
 }
 
 function initHeroFlies() {
