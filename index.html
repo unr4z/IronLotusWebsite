@@ -2178,6 +2178,7 @@ function initRuinaGate() {
     "you will be there, lying in my sheets, O sorrow,",
     "so that you might once again attempt to enter my heart.",
   ];
+  const RUINA_TIMES = [0, 3.64, 8.19, 13.54, 17.65, 22.09, 26.04, 32, 36.94, 40.45, 45.6, 51.85, 58.36, 63.58, 67.41];
   let timedLyrics = null, lastIdx = -1, buildTries = 0;
   let glitchOn = false, glitchTimer = null, glitchRevert = null, finalStarted = false, lyrTimer = null, finalSafety = null;
   const finalbg = rg.querySelector(".rg-finalbg");
@@ -2195,6 +2196,7 @@ function initRuinaGate() {
   function startGlitchCycle() { stopGlitchCycle(); scheduleGlitch(); }
   function stopGlitchCycle() { clearTimeout(glitchTimer); glitchTimer = null; clearTimeout(glitchRevert); glitchRevert = null; glitchOn = false; rg.classList.remove("glitching"); try { RuinaMusic.duck(false); } catch (e) {} if (icon) icon.classList.remove("glitch"); }
   function buildTimings() {
+    if (RUINA_TIMES && RUINA_TIMES.length === RUINA_LINES.length) { timedLyrics = RUINA_LINES.map((text, i) => ({ t: RUINA_TIMES[i], text })); return true; }
     const dur = FinalMusic.duration(); const intro = 7, endpad = 5;
     if (dur && dur > intro + endpad + 6) {
       const span = dur - intro - endpad; const w = RUINA_LINES.map((s) => Math.max(10, s.length)); const tot = w.reduce((a, b) => a + b, 0);
