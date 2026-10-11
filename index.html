@@ -2149,8 +2149,9 @@ function initRuinaGate() {
     try { Ambience.typeDark(); } catch (e) {}
     glitchRevert = setTimeout(() => { glitchOn = false; if (icon) { icon.src = RUINA_ICON; icon.classList.remove("glitch"); } }, 4000);
   }
-  function startGlitchCycle() { stopGlitchCycle(); glitchTimer = setInterval(() => { if (Math.random() < 0.6) enterGlitch(); }, 40000); }
-  function stopGlitchCycle() { clearInterval(glitchTimer); glitchTimer = null; clearTimeout(glitchRevert); glitchRevert = null; glitchOn = false; if (icon) icon.classList.remove("glitch"); }
+  function scheduleGlitch() { clearTimeout(glitchTimer); const delay = 40000 + Math.random() * 40000; glitchTimer = setTimeout(() => { enterGlitch(); scheduleGlitch(); }, delay); }
+  function startGlitchCycle() { stopGlitchCycle(); scheduleGlitch(); }
+  function stopGlitchCycle() { clearTimeout(glitchTimer); glitchTimer = null; clearTimeout(glitchRevert); glitchRevert = null; glitchOn = false; if (icon) icon.classList.remove("glitch"); }
   function showLyric() {
     const tt = FinalMusic.time(); let cur = null;
     for (const L of RUINA_LYRICS) { if (tt >= L.t) cur = L; else break; }
