@@ -508,7 +508,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 /* ---- community / join card ---- */
 .community { display: flex; align-items: center; justify-content: space-between; gap: 22px; flex-wrap: wrap; max-width: none; margin: 30px 0 0; padding: 22px 26px; background: linear-gradient(180deg, rgba(var(--f-rgb),.06), var(--panel)); border: 1px solid var(--line-strong); border-radius: var(--radius); }
 .community-main { display: flex; align-items: center; gap: 16px; }
-.community-ic { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 12px; background: rgba(var(--f-rgb),.12); color: var(--flame); border: 1px solid var(--gold-soft); }
+.community-ic { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 12px; background: #5865F2; color: #fff; border: 1px solid rgba(255,255,255,.2); box-shadow: 0 4px 14px rgba(88,101,242,.45); }
 .community-ic svg { width: 26px; height: 26px; }
 .community-main h3 { font-family: var(--serif); font-weight: 600; font-size: 1.3rem; margin: 0; }
 .community-sub { margin: 3px 0 0; color: var(--soft); font-weight: 300; font-size: .9rem; max-width: 42ch; }
@@ -516,8 +516,10 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 .community-count { font-family: var(--sans); font-size: .85rem; color: var(--soft); white-space: nowrap; }
 .community-count b { color: var(--gold); font-size: 1.05rem; }
 .community-count b.online { color: #7fd17f; }
-.community-join { font-family: var(--sans); font-weight: 600; font-size: .9rem; letter-spacing: .04em; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 100px; background: linear-gradient(180deg, var(--flame), var(--ember-deep)); box-shadow: 0 8px 22px rgba(var(--f-rgb),.3); transition: transform .2s ease, box-shadow .25s ease; white-space: nowrap; }
-.community-join:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(var(--f-rgb),.45); }
+.community-join { display: inline-flex; align-items: center; gap: 9px; font-family: var(--sans); font-weight: 700; font-size: .92rem; letter-spacing: .02em; color: #fff; text-decoration: none; padding: 11px 22px; border-radius: 12px; background: linear-gradient(180deg, #5d6bff, #4752e0); box-shadow: 0 8px 22px rgba(88,101,242,.42), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .18s ease, box-shadow .25s ease, background .2s ease; white-space: nowrap; }
+.community-join .dc-ic { width: 20px; height: 20px; }
+.community-join:active { transform: translateY(0); }
+.community-join:hover { transform: translateY(-2px); background: linear-gradient(180deg, #6b78ff, #5865F2); box-shadow: 0 12px 30px rgba(88,101,242,.6), inset 0 1px 0 rgba(255,255,255,.3); }
 
 /* ---- mobile pass ---- */
 @media (max-width: 560px) {
@@ -641,7 +643,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
         </div>
         <div class="community-side">
           <span class="community-count" id="communityCount">Members</span>
-          <a class="community-join" id="communityJoin" href="#" target="_blank" rel="noopener">Join ↗</a>
+          <a class="community-join" id="communityJoin" href="#" target="_blank" rel="noopener"><svg class="dc-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4a18 18 0 0 0-4.5-1.4l-.3.6A16 16 0 0 1 18 4.9 15 15 0 0 0 6 4.9 16 16 0 0 1 8.8 3.2l-.3-.6A18 18 0 0 0 4 4 19 19 0 0 0 1 17.6 18 18 0 0 0 6.5 20l.6-1a12 12 0 0 1-1.9-.9l.5-.4a13 13 0 0 0 10.6 0l.5.4a12 12 0 0 1-1.9.9l.6 1A18 18 0 0 0 23 17.6 19 19 0 0 0 20 4ZM9 14.3c-.9 0-1.6-.8-1.6-1.8S8.1 10.7 9 10.7s1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z"/></svg>Join</a>
         </div>
       </section>
         </div>
