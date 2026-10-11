@@ -572,6 +572,11 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
   75% { opacity: .5; }
 }
 @media (max-width: 560px) { .bg-rays span { filter: blur(11px); } }
+.trial-embers { position: fixed; inset: 0; pointer-events: none; z-index: 8; overflow: hidden; opacity: 0; transition: opacity .6s ease; }
+body.on-challenge .trial-embers { opacity: 1; }
+.trial-embers::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 120px rgba(255,90,20,.18); }
+.trial-embers span { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,226,150,.95), rgba(255,140,60,.55) 45%, transparent 72%); box-shadow: 0 0 8px 2px rgba(255,120,50,.5); opacity: 0; animation: fly var(--dur,6s) ease-in-out infinite; }
+body:not(.on-challenge) .trial-embers span { animation-play-state: paused; }
 </style>
 </head>
 <body>
@@ -588,6 +593,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 <div class="bg-scene" aria-hidden="true"></div>
 <div class="bg-rays" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 <div class="bg-flies" id="heroFlies" aria-hidden="true"></div>
+<div class="trial-embers" id="trialEmbers" aria-hidden="true"></div>
 <canvas id="fire" aria-hidden="true"></canvas>
 <div class="emberglow" aria-hidden="true"></div>
 <div class="haze" aria-hidden="true"></div>
@@ -1010,6 +1016,7 @@ function initPages() {
     nav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false");
     if (history.replaceState) history.replaceState(null, "", `#${name}`);
     if (name === "challenge") { Jukebox.start("challenge"); ChallengeMusic.play(); } else { ChallengeMusic.stop(); Jukebox.stop("challenge"); }
+    document.body.classList.toggle("on-challenge", name === "challenge");
     reReveal(name); heroReset();
   }
   $$("[data-page]").forEach((el) => el.addEventListener("click", () => show(el.dataset.page)));
@@ -1454,6 +1461,7 @@ const BgMusic = (() => {
     setDucked(d) { ducked = d; apply(); },
     setVol(v) { VOL = Math.max(0, Math.min(100, v | 0)); try { localStorage.setItem("il-vol", String(VOL)); } catch (e) {} if (player && ready) { try { player.setVolume(VOL); } catch (e) {} } },
     getVol() { return VOL; },
+    isPlaying() { try { return !!player && ready && player.getPlayerState && player.getPlayerState() === 1; } catch (e) { return false; } },
   };
 })();
 
@@ -1467,7 +1475,7 @@ const Jukebox = (() => {
 })();
 
 const ChallengeMusic = (() => {
-  const VIDEO = "d1ltfEtDi5U", VOL = 32;   // Trial by Fire page track
+  const VIDEO = "d1ltfEtDi5U", VOL = 18;   // Trial by Fire page track
   let player = null, ready = false, failed = false, loading = false, on = false, muted = false;
   try { muted = localStorage.getItem("il-muted") === "1"; } catch (e) {}
   function apply() {
@@ -1512,6 +1520,8 @@ function initAmbience() {
   BgMusic.preload();
   const kick = () => { Ambience.start(); SFX.prime(); HoverTune.warm(); PosePlayer.warm(); BgMusic.start(); ChallengeMusic.warm(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
   addEventListener("pointerdown", kick); addEventListener("keydown", kick);
+  const ensureBg = () => { BgMusic.start(); if (BgMusic.isPlaying()) { removeEventListener("pointerdown", ensureBg); removeEventListener("keydown", ensureBg); } };
+  addEventListener("pointerdown", ensureBg); addEventListener("keydown", ensureBg);
   btn.addEventListener("click", (e) => { e.stopPropagation(); Ambience.start(); BgMusic.start(); const m = !Ambience.isMuted(); Ambience.setMuted(m); HoverTune.setMuted(m); PosePlayer.setMuted(m); BgMusic.setMuted(m); ChallengeMusic.setMuted(m); paint(); });
   const bgVol = $("#bgVol");
   if (bgVol) { try { bgVol.value = BgMusic.getVol(); } catch (e) {} bgVol.addEventListener("input", (e) => { e.stopPropagation(); BgMusic.start(); BgMusic.setVol(+bgVol.value); }); bgVol.addEventListener("click", (e) => e.stopPropagation()); }
@@ -1853,10 +1863,31 @@ function initHeroFlies() {
   host.innerHTML = html;
 }
 
+function initTrialEmbers() {
+  const host = $("#trialEmbers"); if (!host) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const n = LOW_FX ? 18 : 40;
+  let html = "";
+  for (let i = 0; i < n; i++) {
+    const edge = i % 4, along = (Math.random()*100).toFixed(1), inset = (Math.random()*9).toFixed(1);
+    let left, top;
+    if (edge === 0) { top = inset; left = along; }
+    else if (edge === 1) { top = (100 - parseFloat(inset)).toFixed(1); left = along; }
+    else if (edge === 2) { left = inset; top = along; }
+    else { left = (100 - parseFloat(inset)).toFixed(1); top = along; }
+    const sz = (2 + Math.random()*3).toFixed(1);
+    const dur = (3.5 + Math.random()*4).toFixed(1);
+    const del = (-Math.random()*8).toFixed(1);
+    const dx = ((Math.random()*2-1)*16).toFixed(0), dy = (-(6 + Math.random()*20)).toFixed(0);
+    html += `<span style="left:${left}%;top:${top}%;width:${sz}px;height:${sz}px;--dx:${dx}px;--dy:${dy}px;--dur:${dur}s;animation-delay:${del}s"></span>`;
+  }
+  host.innerHTML = html;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   render(); initCnFrames(); initReveal(); initPages(); initBar(); initParallax(); initSearch();
   initLightbox(); initSfx(); initFire(); initAmbience(); initOwnerFire(); initTextFire();
-  initExtras(); initLoader(); initScroll(); initCommunity(); initHeroFlies();
+  initExtras(); initLoader(); initScroll(); initCommunity(); initHeroFlies(); initTrialEmbers();
 });
 </script>
 </body>
