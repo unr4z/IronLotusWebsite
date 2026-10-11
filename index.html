@@ -542,6 +542,30 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 .owner-quote-img { display: flex; justify-content: center; align-items: center; }
 .owner-quote-img img { max-width: 230px; width: 100%; height: auto; filter: drop-shadow(0 6px 22px rgba(0,0,0,.5)); }
 @media (max-width: 760px) { .owner-quote-img img { max-width: 200px; } }
+
+/* ---- hero god-rays + hovering fireflies ---- */
+.hero { position: relative; }
+.hero-rays, .hero-flies { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.hero-rays { mix-blend-mode: screen; }
+.hero-rays span { position: absolute; top: -24%; height: 150%; transform-origin: top center;
+  background: linear-gradient(to bottom, rgba(255,208,135,.18), rgba(255,170,80,.05) 55%, transparent 82%);
+  filter: blur(16px); opacity: .5; animation: rayglow 8s ease-in-out infinite alternate; }
+.hero-rays span:nth-child(1) { right: 34%; width: 70px; transform: rotate(15deg); animation-delay: 0s; }
+.hero-rays span:nth-child(2) { right: 24%; width: 110px; transform: rotate(21deg); animation-delay: 1.6s; }
+.hero-rays span:nth-child(3) { right: 14%; width: 82px; transform: rotate(27deg); animation-delay: 2.9s; }
+.hero-rays span:nth-child(4) { right: 3%; width: 130px; transform: rotate(33deg); animation-delay: .8s; }
+@keyframes rayglow { 0% { opacity: .2; } 100% { opacity: .68; } }
+.hero-flies span { position: absolute; border-radius: 50%; will-change: transform, opacity;
+  background: radial-gradient(circle, rgba(255,230,160,.95), rgba(255,185,95,.55) 45%, transparent 72%);
+  box-shadow: 0 0 8px 2px rgba(255,190,100,.45); opacity: 0;
+  animation: fly var(--dur,8s) ease-in-out infinite; }
+@keyframes fly {
+  0%, 100% { transform: translate(0,0) scale(.75); opacity: .18; }
+  25% { opacity: .95; }
+  50% { transform: translate(var(--dx,10px), var(--dy,-12px)) scale(1.12); opacity: 1; }
+  75% { opacity: .5; }
+}
+@media (max-width: 560px) { .hero-rays span { filter: blur(11px); } }
 </style>
 </head>
 <body>
@@ -581,6 +605,8 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
   <!-- HOME -->
   <section class="page is-active" id="page-home">
     <div class="hero">
+      <div class="hero-rays" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="hero-flies" id="heroFlies" aria-hidden="true"></div>
       <div class="hero-inner">
         <span class="hero-emblem" id="homeEmblem"></span>
         <p class="kicker">Kizuki · Custom Weapon</p>
@@ -1743,10 +1769,26 @@ function initCommunity() {
   }
 }
 
+function initHeroFlies() {
+  const host = $("#heroFlies"); if (!host) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const n = LOW_FX ? 7 : 15;
+  let html = "";
+  for (let i = 0; i < n; i++) {
+    const left = (44 + Math.random()*50).toFixed(1), top = (8 + Math.random()*62).toFixed(1);
+    const sz = (2 + Math.random()*3.2).toFixed(1);
+    const dur = (6 + Math.random()*6).toFixed(1);
+    const del = (-Math.random()*10).toFixed(1);
+    const dx = ((Math.random()*2-1)*20).toFixed(0), dy = (-(8 + Math.random()*22)).toFixed(0);
+    html += `<span style="left:${left}%;top:${top}%;width:${sz}px;height:${sz}px;--dx:${dx}px;--dy:${dy}px;--dur:${dur}s;animation-delay:${del}s"></span>`;
+  }
+  host.innerHTML = html;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   render(); initCnFrames(); initReveal(); initPages(); initBar(); initParallax(); initSearch();
   initLightbox(); initSfx(); initFire(); initAmbience(); initOwnerFire(); initTextFire();
-  initExtras(); initLoader(); initScroll(); initCommunity();
+  initExtras(); initLoader(); initScroll(); initCommunity(); initHeroFlies();
 });
 </script>
 </body>
