@@ -20,7 +20,7 @@
 <meta name="theme-color" content="#140a04" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@300;400;500;600&family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
 <style>
 /* =========================================================
@@ -516,12 +516,10 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 .community-count { font-family: var(--sans); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); white-space: nowrap; }
 .community-count b { font-family: var(--display); font-weight: 700; color: var(--gold); font-size: 1.45rem; text-transform: none; text-shadow: 0 0 14px rgba(255,184,77,.35); }
 .community-count b.online, .community-count .online { color: #7fd17f; font-weight: 400; }
-.community-join { display: inline-flex; align-items: center; gap: 10px; color: #fff2e6; text-decoration: none; padding: 8px 20px; border-radius: 12px; background: linear-gradient(180deg, rgba(var(--f-rgb),.2), rgba(194,58,10,.16)); border: 1px solid rgba(var(--f-rgb),.55); box-shadow: 0 6px 18px rgba(var(--f-rgb),.2), inset 0 1px 0 rgba(255,255,255,.12); backdrop-filter: blur(4px); transition: transform .18s ease, box-shadow .25s ease, background .2s ease, border-color .2s ease; white-space: nowrap; }
-.community-join .jn-cn { font-family: "Ma Shan Zheng", var(--display); font-size: 1.35rem; line-height: 1; text-shadow: 0 0 12px rgba(var(--f-rgb),.5); }
-.community-join .jn-en { font-family: var(--sans); font-weight: 600; font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; opacity: .85; }
+.community-join { display: inline-flex; align-items: center; gap: 9px; font-family: var(--sans); font-weight: 700; font-size: .86rem; letter-spacing: .1em; text-transform: uppercase; color: #fff2e6; text-decoration: none; padding: 10px 24px; border-radius: 10px; background: linear-gradient(180deg, rgba(var(--f-rgb),.2), rgba(194,58,10,.16)); border: 1px solid rgba(var(--f-rgb),.6); outline: 1px solid rgba(var(--f-rgb),.32); outline-offset: 3px; box-shadow: 0 6px 18px rgba(var(--f-rgb),.2), inset 0 1px 0 rgba(255,255,255,.12); backdrop-filter: blur(4px); transition: transform .18s ease, box-shadow .25s ease, background .2s ease, border-color .2s ease, outline-color .2s ease; white-space: nowrap; }
 .community-join .dc-ic { width: 20px; height: 20px; }
 .community-join:active { transform: translateY(0); }
-.community-join:hover { transform: translateY(-2px); background: linear-gradient(180deg, rgba(var(--f-rgb),.34), rgba(194,58,10,.3)); border-color: var(--flame); box-shadow: 0 10px 26px rgba(var(--f-rgb),.42), inset 0 1px 0 rgba(255,255,255,.18); }
+.community-join:hover { transform: translateY(-2px); background: linear-gradient(180deg, rgba(var(--f-rgb),.34), rgba(194,58,10,.3)); border-color: var(--flame); outline-color: var(--flame); box-shadow: 0 10px 26px rgba(var(--f-rgb),.42), inset 0 1px 0 rgba(255,255,255,.18); }
 
 /* ---- mobile pass ---- */
 @media (max-width: 560px) {
@@ -645,7 +643,7 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
         </div>
         <div class="community-side">
           <span class="community-count" id="communityCount">Members</span>
-          <a class="community-join" id="communityJoin" href="https://discord.gg/ymftgbtsY9" target="_blank" rel="noopener"><span class="jn-cn">加入</span><span class="jn-en">Join</span></a>
+          <a class="community-join" id="communityJoin" href="https://discord.gg/ymftgbtsY9" target="_blank" rel="noopener">Join</a>
         </div>
       </section>
         </div>
