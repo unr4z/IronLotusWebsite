@@ -513,8 +513,8 @@ body.blackout .page.is-active .hero-title, body.blackout .page.is-active .page-t
 .community-main h3 { font-family: var(--serif); font-weight: 600; font-size: 1.3rem; margin: 0; }
 .community-sub { margin: 3px 0 0; color: var(--soft); font-weight: 300; font-size: .9rem; max-width: 42ch; }
 .community-side { display: flex; align-items: center; gap: 16px; }
-.community-count { font-family: var(--sans); font-size: .85rem; color: var(--soft); white-space: nowrap; }
-.community-count b { color: var(--gold); font-size: 1.05rem; }
+.community-count { font-family: var(--sans); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); white-space: nowrap; }
+.community-count b { font-family: var(--display); font-weight: 700; color: var(--gold); font-size: 1.45rem; text-transform: none; text-shadow: 0 0 14px rgba(255,184,77,.35); }
 .community-count b.online, .community-count .online { color: #7fd17f; font-weight: 400; }
 .community-join { display: inline-flex; align-items: center; gap: 9px; font-family: var(--sans); font-weight: 700; font-size: .92rem; letter-spacing: .02em; color: #fff; text-decoration: none; padding: 11px 22px; border-radius: 12px; background: linear-gradient(180deg, #5d6bff, #4752e0); box-shadow: 0 8px 22px rgba(88,101,242,.42), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .18s ease, box-shadow .25s ease, background .2s ease; white-space: nowrap; }
 .community-join .dc-ic { width: 20px; height: 20px; }
@@ -1486,8 +1486,8 @@ function initOwnerFire() {
   }
   function kick() { if (!raf) { resize(); raf = requestAnimationFrame(frame); } }
   const main = document.querySelector("main");
-  card.addEventListener("mouseenter", () => { hovering = true; kick(); if (main) main.classList.add("web-shake"); });
-  card.addEventListener("mouseleave", () => { hovering = false; if (main) main.classList.remove("web-shake"); });
+  card.addEventListener("mouseenter", () => { hovering = true; kick(); });
+  card.addEventListener("mouseleave", () => { hovering = false; });
   addEventListener("resize", () => { if (raf) resize(); });
 }
 
