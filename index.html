@@ -2214,8 +2214,9 @@ function initRuinaGate() {
     const tt = FinalMusic.time(); let idx = -1, best = -Infinity;
     for (let i = 0; i < timedLyrics.length; i++) { const tv = timedLyrics[i].t + LYRIC_OFFSET; if (tv <= tt && tv >= best) { best = tv; idx = i; } }
     if (idx === lastIdx) return; lastIdx = idx;
+    const wasShown = !!(lyrics && lyrics.classList.contains("show"));
     if (lyrics) lyrics.classList.remove("show");
-    setTimeout(() => { if (lyrEn) lyrEn.textContent = idx >= 0 ? timedLyrics[idx].text : ""; if (lyrics && idx >= 0) lyrics.classList.add("show"); }, 450);
+    setTimeout(() => { if (lyrEn) lyrEn.textContent = idx >= 0 ? timedLyrics[idx].text : ""; if (lyrics && idx >= 0) lyrics.classList.add("show"); }, wasShown ? 450 : 0);
   }
   function closeSite() {
     try { FinalMusic.stop(); } catch (e) {}
