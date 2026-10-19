@@ -2333,17 +2333,18 @@ function initRuinaGate() {
 function initScrollBlur() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const root = document.documentElement, body = document.body;
-  let lastY = window.scrollY || 0, blur = 0, ticking = false;
+  let lastY = window.scrollY || 0, target = 0, cur = 0, ticking = false;
   function loop() {
-    blur *= 0.8;
-    if (blur < 0.06) { blur = 0; root.style.setProperty("--sb", "0px"); body.classList.remove("blurscroll"); ticking = false; return; }
-    root.style.setProperty("--sb", blur.toFixed(2) + "px");
+    target *= 0.86;
+    cur += (target - cur) * 0.18;
+    if (cur < 0.04 && target < 0.04) { cur = 0; root.style.setProperty("--sb", "0px"); body.classList.remove("blurscroll"); ticking = false; return; }
+    root.style.setProperty("--sb", cur.toFixed(2) + "px");
     requestAnimationFrame(loop);
   }
   addEventListener("scroll", () => {
     const y = window.scrollY || 0; const v = Math.abs(y - lastY); lastY = y;
-    blur = Math.min(7, Math.max(blur, v * 0.14));
-    if (blur > 0.06) { body.classList.add("blurscroll"); if (!ticking) { ticking = true; requestAnimationFrame(loop); } }
+    target = Math.min(3.5, Math.max(target, v * 0.08));
+    body.classList.add("blurscroll"); if (!ticking) { ticking = true; requestAnimationFrame(loop); }
   }, { passive: true });
 }
 
